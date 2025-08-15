@@ -1,68 +1,65 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import 'tailwindcss';
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+@theme {
+  --bg: 255 255 255;
+  --box: 255 255 255;
+  --border: 229 231 235;
+  --sd: 226 232 240 / 0.5;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* primary text color */
+  --text-primary: 23 37 84;
+
+  /* secondary/muted text, less contrast */
+  --text-muted: 23 37 84;
+
+  /* accent text, links or highlights */
+  --text-accent: 55 65 81;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+.dark {
+  --bg: 3 7 18;
+  --box: 17 24 39;
+  --border: 243 244 246 / 0.1;
+  --sd: trasparent;
+  --text-primary: 255 255 255;
+  --text-muted: 243 244 246;
+  --text-accent: 209 213 219;
 }
-a:hover {
-  color: #535bf2;
+
+@layer utilities {
+  .bg {
+    background-color: rgb(var(--bg));
+  }
+
+  .box {
+    background-color: rgb(var(--box));
+  }
+
+  .border {
+    border-color: rgb(var(--border));
+  }
+
+  .sd {
+    box-shadow: 0 1px 2px rgb(var(--sd));
+  }
+
+  .text-primary {
+    color: rgb(var(--text-primary));
+  }
+
+  .text-muted {
+    color: rgb(var(--text-muted));
+  }
+
+  .text-accent {
+    color: rgb(var(--text-accent));
+  }
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+  font-family: 'Raleway', sans-serif;
 }
