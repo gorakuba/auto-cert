@@ -43,14 +43,18 @@ export const Content = ({
         onChangeStyles={onChangeStyles}
       >
         <h1
-          className={activeId === 'name' ? 'inline-block' : 'inline-block'}
           style={{
             ...textStyles['name'],
+            userSelect: 'none',
             outline: 'none',
             boxShadow: 'none',
+            background: 'transparent',
+            border: 'none',
+            WebkitBoxShadow: 'none',
+            MozBoxShadow: 'none',
           }}
         >
-          {name || 'Sample Name'}
+          {name}
         </h1>
       </Item>
 
@@ -61,7 +65,23 @@ export const Content = ({
           onClick={(e) => handleClick(e, 'qr')}
           active={activeId === 'qr'}
         >
-          <QRCode value={qr} size={qrSize} />
+          <div
+            style={{
+              background: 'transparent',
+              border: 'none',
+              boxShadow: 'none',
+              WebkitBoxShadow: 'none',
+              MozBoxShadow: 'none',
+              padding: 0,
+            }}
+          >
+            <QRCode
+              value={qr}
+              size={qrSize}
+              bgColor='transparent'
+              style={{ border: 'none' }}
+            />
+          </div>
         </Item>
       ) : null}
 
@@ -73,7 +93,18 @@ export const Content = ({
           onClick={(e) => handleClick(e, `extra-${text.id}`)}
           active={activeId === `extra-${text.id}`}
         >
-          <div className={`cursor-default`} style={{ fontSize: '24px' }}>
+          <div
+            className='cursor-default'
+            style={{
+              fontSize: '24px',
+              background: 'transparent',
+              border: 'none',
+              boxShadow: 'none',
+              WebkitBoxShadow: 'none',
+              MozBoxShadow: 'none',
+              padding: 0,
+            }}
+          >
             {text.value}
           </div>
         </Item>

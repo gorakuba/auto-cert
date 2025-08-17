@@ -63,7 +63,16 @@ export const DnDContent = ({
       <DraggableItem id='name' position={position} dnd>
         <h1
           className='outline-none shadow-none font-bold text-3xl'
-          style={textStyles['name']}
+          style={{
+            ...textStyles['name'],
+            userSelect: 'none',
+            outline: 'none',
+            boxShadow: 'none',
+            background: 'transparent',
+            border: 'none',
+            WebkitBoxShadow: 'none',
+            MozBoxShadow: 'none',
+          }}
         >
           {name}
         </h1>
@@ -71,7 +80,23 @@ export const DnDContent = ({
 
       {qr ? (
         <DraggableItem id='qr' position={qrPosition} dnd>
-          <QRCode value={qr} size={qrSize} />
+          <div
+            style={{
+              background: 'transparent',
+              border: 'none',
+              boxShadow: 'none',
+              WebkitBoxShadow: 'none',
+              MozBoxShadow: 'none',
+              padding: 0,
+            }}
+          >
+            <QRCode
+              value={qr}
+              size={qrSize}
+              bgColor='transparent'
+              style={{ border: 'none' }}
+            />
+          </div>
         </DraggableItem>
       ) : null}
 
@@ -83,7 +108,20 @@ export const DnDContent = ({
           active={activeId === `extra-${text.id}`}
           dnd
         >
-          <div className='cursor-move text-2xl font-medium'>{text.value}</div>
+          <div
+            className='cursor-move text-2xl font-medium'
+            style={{
+              fontSize: '24px',
+              background: 'transparent',
+              border: 'none',
+              boxShadow: 'none',
+              WebkitBoxShadow: 'none',
+              MozBoxShadow: 'none',
+              padding: 0,
+            }}
+          >
+            {text.value}
+          </div>
         </DraggableItem>
       ))}
     </DndContext>

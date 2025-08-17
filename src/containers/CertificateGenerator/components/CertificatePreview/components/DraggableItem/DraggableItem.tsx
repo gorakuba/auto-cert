@@ -35,10 +35,13 @@ export const DraggableItem = ({
         left: transform ? position.x + transform.x : position.x,
         top: transform ? position.y + transform.y : position.y,
         touchAction: 'none',
+        outline: 'none',
+        border: 'none',
+        boxShadow: 'none',
       }}
       className={`absolute z-10 rounded-lg px-2 ${
         dnd ? 'cursor-move' : 'cursor-default'
-      } ${active ? 'border-2 border-dashed border-blue-500' : ''}`}
+      }`}
       {...attributes}
       {...(dnd ? listeners : {})}
       onClick={onClick}

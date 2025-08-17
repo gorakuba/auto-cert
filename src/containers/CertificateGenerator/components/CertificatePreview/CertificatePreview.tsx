@@ -20,6 +20,7 @@ interface Props {
   qrPosition: Position
   qrSize: number
   template: string | null
+  dnd: boolean
   extraTexts: { id: string; value: string; position: Position }[]
   innerRef: (el: HTMLDivElement | null) => void
   handleStop: (type: DraggingType, data: Position, id?: string) => void
@@ -32,12 +33,12 @@ export const CertificatePreview = ({
   qrPosition,
   qrSize,
   template,
+  dnd,
   extraTexts,
   innerRef,
   handleStop,
 }: Props) => {
   const [activeId, setActiveId] = useState<string | null>(null)
-  const [dndEnabled, setDndEnabled] = useState(false)
 
   const [textStyles, setTextStyles] = useState<Record<string, TextStyle>>({
     name: defaultStyles,
@@ -56,60 +57,52 @@ export const CertificatePreview = ({
   }
 
   return (
-    <>
-      <label className='mb-4 inline-flex items-center space-x-2'>
-        <input
-          type='checkbox'
-          checked={dndEnabled}
-          onChange={() => setDndEnabled((v) => !v)}
+    <div
+      className='relative'
+      ref={innerRef}
+      onClick={() => setActiveId(null)}
+      style={{
+        userSelect: 'none',
+        background: 'transparent',
+        border: 'none',
+        boxShadow: 'none',
+      }}
+    >
+      {template && (
+        <img
+          src={template}
+          alt='template'
+          className='w-full shadow-lg border-none'
+          draggable={false}
         />
+      )}
 
-        <span>Drag & Drop</span>
-      </label>
-
-      <div
-        className='relative'
-        ref={innerRef}
-        onClick={() => setActiveId(null)}
-        style={{ userSelect: 'none' }}
-      >
-        {template && (
-          <img
-            src={template}
-            alt='template'
-            className='w-full'
-            style={{ aspectRatio: '16/9' }}
-            draggable={false}
-          />
-        )}
-
-        {dndEnabled ? (
-          <DnDContent
-            name={name}
-            qr={qr}
-            qrSize={qrSize}
-            position={position}
-            qrPosition={qrPosition}
-            activeId={activeId}
-            textStyles={textStyles}
-            extraTexts={extraTexts}
-            onStop={handleStop}
-          />
-        ) : (
-          <Content
-            name={name}
-            qr={qr}
-            qrSize={qrSize}
-            position={position}
-            qrPosition={qrPosition}
-            activeId={activeId}
-            textStyles={textStyles}
-            extraTexts={extraTexts}
-            onChangeActiveId={setActiveId}
-            onChangeStyles={handleChangeStyles}
-          />
-        )}
-      </div>
-    </>
+      {dnd ? (
+        <DnDContent
+          name={name}
+          qr={qr}
+          qrSize={qrSize}
+          position={position}
+          qrPosition={qrPosition}
+          activeId={activeId}
+          textStyles={textStyles}
+          extraTexts={extraTexts}
+          onStop={handleStop}
+        />
+      ) : (
+        <Content
+          name={name}
+          qr={qr}
+          qrSize={qrSize}
+          position={position}
+          qrPosition={qrPosition}
+          activeId={activeId}
+          textStyles={textStyles}
+          extraTexts={extraTexts}
+          onChangeActiveId={setActiveId}
+          onChangeStyles={handleChangeStyles}
+        />
+      )}
+    </div>
   )
 }

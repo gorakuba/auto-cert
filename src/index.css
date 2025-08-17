@@ -63,3 +63,41 @@ html {
 body {
   font-family: 'Raleway', sans-serif;
 }
+
+::-webkit-scrollbar {
+  width: 12px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #fb923c 40%, #f59e42 100%);
+  border-radius: 8px;
+  border: 2px solid #fff;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #f59e42 40%, #fb923c 100%);
+}
+
+::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 8px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #fb923c 40%, #f59e42 100%);
+  border: 2px solid #23272f;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #23272f;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #fb923c #f3f4f6;
+}
+
+.dark html {
+  scrollbar-color: #fb923c #23272f;
+}
