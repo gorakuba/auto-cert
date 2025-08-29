@@ -40,7 +40,7 @@ export const Menu = ({
   }, [textStyles])
 
   return (
-    <div className='absolute top-[-50%] left-0 bg-gray-50 border border-gray-300 rounded p-1.5 shadow-md z-20 flex gap-1.5'>
+    <div className='absolute top-[-50px] right-[20px] bg-gray-50 border border-gray-300 rounded p-1.5 shadow-md z-20 flex gap-1.5'>
       <button onClick={onBold} className={buttonClass} title='Bold'>
         <FaBold />
       </button>

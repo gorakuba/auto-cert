@@ -10,6 +10,7 @@ interface Props {
   position: Position
   qrPosition: Position
   activeId: string | null
+  dnd: boolean
   textStyles: Record<string, TextStyle>
   extraTexts: { id: string; value: string; position: Position }[]
   onStop: (type: DraggingType, data: Position, id?: string) => void
@@ -25,6 +26,7 @@ export const DnDContent = ({
   textStyles,
   extraTexts,
   onStop,
+  dnd,
 }: Props) => {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, delta } = event
@@ -62,14 +64,18 @@ export const DnDContent = ({
     <DndContext onDragEnd={handleDragEnd}>
       <DraggableItem id='name' position={position} dnd>
         <h1
-          className='outline-none shadow-none font-bold text-3xl'
+          // className='w-[50vw] outline-none shadow-none font-bold text-3xl text-center'
+          className={`w-[50vw] text-center ${
+            activeId === 'name' && !dnd
+              ? 'border-2 border-dashed border-orange-500 rounded-2xl'
+              : 'border-none'
+          }`}
           style={{
             ...textStyles['name'],
             userSelect: 'none',
             outline: 'none',
             boxShadow: 'none',
             background: 'transparent',
-            border: 'none',
             WebkitBoxShadow: 'none',
             MozBoxShadow: 'none',
           }}

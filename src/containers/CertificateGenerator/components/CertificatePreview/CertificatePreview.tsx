@@ -1,5 +1,5 @@
 import type { DraggingType, Position, TextStyle } from '../../types'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { DnDContent } from './components/DnDContent'
 import { FONTS } from './constants'
 import { Content } from './components/Content'
@@ -22,8 +22,11 @@ interface Props {
   template: string | null
   dnd: boolean
   extraTexts: { id: string; value: string; position: Position }[]
+  active: boolean
+  onActivate: () => void
   innerRef: (el: HTMLDivElement | null) => void
-  handleStop: (type: DraggingType, data: Position, id?: string) => void
+  onStop: (type: DraggingType, data: Position, id?: string) => void
+  onDownload: () => void
 }
 
 export const CertificatePreview = ({
@@ -35,8 +38,11 @@ export const CertificatePreview = ({
   template,
   dnd,
   extraTexts,
+  active,
+  onActivate,
   innerRef,
-  handleStop,
+  onStop,
+  onDownload,
 }: Props) => {
   const [activeId, setActiveId] = useState<string | null>(null)
 
@@ -56,6 +62,12 @@ export const CertificatePreview = ({
     }))
   }
 
+  useEffect(() => {
+    if (dnd) {
+      setActiveId(null)
+    }
+  }, [dnd])
+
   return (
     <div
       className='relative'
@@ -68,14 +80,34 @@ export const CertificatePreview = ({
         boxShadow: 'none',
       }}
     >
-      {template && (
-        <img
-          src={template}
-          alt='template'
-          className='w-full shadow-lg border-none'
-          draggable={false}
-        />
-      )}
+      {active ? (
+        <div className='absolute top-0 right-0 w-full flex items-end justify-end bg-gray-700/70 text-white px-4 py-2 z-10'>
+          <button
+            type='button'
+            onClick={onDownload}
+            className='relative flex items-center gap-2 text-white font-medium transition group'
+          >
+            <span className='relative cursor-pointer'>
+              Pobierz
+              <span className='absolute left-1/2 -bottom-0.5 w-0 h-[2px] bg-white transition-all duration-300 ease-out group-hover:w-full group-hover:left-0' />
+            </span>
+          </button>
+        </div>
+      ) : null}
+
+      {template ? (
+        <div
+          onClick={onActivate}
+          className={`relative ${active ? 'ring-4 ring-orange-500' : 'ring-0'}`}
+        >
+          <img
+            src={template}
+            alt='template'
+            className='w-full shadow-lg border-none'
+            draggable={false}
+          />
+        </div>
+      ) : null}
 
       {dnd ? (
         <DnDContent
@@ -87,7 +119,8 @@ export const CertificatePreview = ({
           activeId={activeId}
           textStyles={textStyles}
           extraTexts={extraTexts}
-          onStop={handleStop}
+          dnd={dnd}
+          onStop={onStop}
         />
       ) : (
         <Content
@@ -97,6 +130,7 @@ export const CertificatePreview = ({
           position={position}
           qrPosition={qrPosition}
           activeId={activeId}
+          dnd={dnd}
           textStyles={textStyles}
           extraTexts={extraTexts}
           onChangeActiveId={setActiveId}

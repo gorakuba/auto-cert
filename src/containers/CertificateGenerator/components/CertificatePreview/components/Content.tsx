@@ -9,6 +9,7 @@ interface Props {
   position: Position
   qrPosition: Position
   activeId: string | null
+  dnd: boolean
   textStyles: Record<string, TextStyle>
   extraTexts: { id: string; value: string; position: Position }[]
   onChangeActiveId: (id: string | null) => void
@@ -22,6 +23,7 @@ export const Content = ({
   position,
   qrPosition,
   activeId,
+  dnd,
   textStyles,
   extraTexts,
   onChangeActiveId,
@@ -43,13 +45,17 @@ export const Content = ({
         onChangeStyles={onChangeStyles}
       >
         <h1
+          className={`w-[50vw] text-center ${
+            activeId === 'name' && !dnd
+              ? 'border-2 border-dashed border-orange-500 rounded-2xl'
+              : 'border-none'
+          }`}
           style={{
             ...textStyles['name'],
             userSelect: 'none',
             outline: 'none',
             boxShadow: 'none',
             background: 'transparent',
-            border: 'none',
             WebkitBoxShadow: 'none',
             MozBoxShadow: 'none',
           }}

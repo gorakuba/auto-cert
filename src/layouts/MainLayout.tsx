@@ -13,7 +13,7 @@ export const MainLayout = ({ title, children }: Props) => {
 
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
 
       <main className='flex flex-col gap-y-20 md:gap-y-32 h-screen min-h-screen overflow-y-auto overscroll-y-contain'>
         {children}
