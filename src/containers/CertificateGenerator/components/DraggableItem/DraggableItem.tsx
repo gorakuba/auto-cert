@@ -1,11 +1,10 @@
 import { useDraggable } from '@dnd-kit/core'
-import type { Position, TextStyle } from '../../../../types'
-import type React from 'react'
-import { Menu } from './components/Menu'
+import type { TextStyle } from '../types'
+import { useCertificateContext } from '../../../../contexts'
+import { Menu } from './Menu'
 
 interface Props {
   id: string
-  position: Position
   children: React.ReactNode
   active?: boolean
   dnd?: boolean
@@ -16,7 +15,6 @@ interface Props {
 
 export const DraggableItem = ({
   id,
-  position,
   children,
   active,
   dnd = false,
@@ -24,6 +22,8 @@ export const DraggableItem = ({
   onClick,
   onChangeStyles,
 }: Props) => {
+  const { position } = useCertificateContext()
+
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id,
   })
@@ -34,14 +34,10 @@ export const DraggableItem = ({
       style={{
         left: transform ? position.x + transform.x : position.x,
         top: transform ? position.y + transform.y : position.y,
-        touchAction: 'none',
-        outline: 'none',
-        border: 'none',
-        boxShadow: 'none',
       }}
       className={`absolute z-10 rounded-lg px-2 ${
         dnd ? 'cursor-move' : 'cursor-default'
-      }`}
+      } touch-none outline-none border-none shadow-none`}
       {...attributes}
       {...(dnd ? listeners : {})}
       onClick={onClick}

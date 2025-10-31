@@ -1,16 +1,5 @@
 import type { CSSProperties } from 'react'
 
-export type Position = {
-  x: number
-  y: number
-}
-
-export type ExtraText = {
-  id: string
-  value: string
-  position: Position
-}
-
 export type TextStyle = {
   fontWeight: CSSProperties['fontWeight']
   fontStyle: CSSProperties['fontStyle']
@@ -19,5 +8,3 @@ export type TextStyle = {
   fontFamily: CSSProperties['fontFamily']
   fontSize: CSSProperties['fontSize']
 }
-
-export type DraggingType = 'name' | 'qr' | 'customImage' | 'extraTexts'

@@ -1,14 +1,10 @@
 import { CertificateGenerator } from './containers/'
-import { ThemeProvider } from './contexts'
-import { MainLayout } from './layouts'
 
 function App() {
   return (
-    <ThemeProvider>
-      <MainLayout title='Home'>
-        <CertificateGenerator />
-      </MainLayout>
-    </ThemeProvider>
+    <main className='flex flex-col gap-y-20 md:gap-y-32 h-screen min-h-screen overflow-y-auto overscroll-y-contain'>
+      <CertificateGenerator />
+    </main>
   )
 }
 

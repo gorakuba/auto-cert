@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
-import { FaBold, FaItalic, FaUnderline } from 'react-icons/fa'
 import { MdFontDownload } from 'react-icons/md'
-import type { TextStyle } from '../../../../../types'
-import { FONTS } from '../../../constants'
+import { FONTS } from '../constants'
+import { FaBold, FaItalic, FaUnderline } from 'react-icons/fa'
+import { useEffect, useState } from 'react'
+import type { TextStyle } from '../types'
 
 interface Props {
   textStyles?: TextStyle
@@ -27,7 +27,7 @@ export const Menu = ({
   const [selectedColor, setSelectedColor] = useState(textStyles?.color)
 
   const buttonClass =
-    'bg-none border-none cursor-pointer p-1.5 text-[18px] flex items-center justify-center text-gray-800 hover:bg-gray-200 rounded'
+    'bg-transparent border-0 cursor-pointer p-1.5 text-[18px] flex items-center justify-center text-gray-800 hover:bg-gray-200 rounded'
 
   useEffect(() => {
     if (textStyles?.fontFamily) {
@@ -57,7 +57,7 @@ export const Menu = ({
         <input
           value={selectedColor}
           type='color'
-          className='border-none w-5 h-6 p-0 bg-transparent cursor-pointer'
+          className='border-0 w-5 h-6 p-0 bg-transparent cursor-pointer'
           onChange={(e) => {
             onColor?.(e.target.value)
             setSelectedColor(e.target.value)
@@ -84,17 +84,19 @@ export const Menu = ({
                 setSelectedFont(e.target.value)
                 setShowFontSelect(false)
               }}
-              className='border-none outline-none w-[180px] text-sm bg-transparent'
+              className='border-0 outline-none w-[180px] text-sm bg-transparent'
             >
               {FONTS.map((font) => (
                 <option
                   key={font}
                   value={font}
+                  className={`p-1 ${
+                    font === selectedFont
+                      ? 'bg-[#aa824f] text-white'
+                      : 'bg-transparent'
+                  }`}
                   style={{
                     fontFamily: font,
-                    backgroundColor:
-                      font === selectedFont ? '#aa824f' : 'transparent',
-                    padding: '4px',
                   }}
                 >
                   {font}
