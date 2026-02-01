@@ -22,3 +22,18 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Testing
+coverage
+.nyc_output
+
+# Environment environments
+.env
+.env.test
+.env.production
+
+# TypeScript
+*.tsbuildinfo
+
+# OS
+Thumbs.db

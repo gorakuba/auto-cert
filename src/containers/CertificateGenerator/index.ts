@@ -1,1 +1,0 @@
-export { CertificateGenerator } from './CertificateGenerator'
