@@ -1,332 +1,344 @@
-import { useMemo } from 'react'
-import type { Participant, TemplateInfo } from '../types'
+import { useMemo } from "react";
+import type { Participant, TemplateInfo } from "../types";
 
 interface DashboardProps {
-  participants: Participant[]
-  templates: TemplateInfo[]
-  generatedCount: number
-  projectsCount: number
-  onQuickAction: (action: string) => void
-  selectedTemplate?: TemplateInfo | null
-}
-
-interface QuickActionProps {
-  title: string
-  description: string
-  icon: React.ReactNode
-  onClick: () => void
-  badge?: string
-  status?: 'ready' | 'warning' | 'info' | 'disabled'
-  disabled?: boolean
-  disabledReasons?: string[]
-}
-
-const QuickAction = ({
-  title,
-  description,
-  icon,
-  onClick,
-  badge,
-  status,
-  disabled = false,
-  disabledReasons,
-}: QuickActionProps) => {
-  return (
-    <div className='relative group h-full'>
-      <button
-        onClick={disabled ? undefined : onClick}
-        disabled={disabled}
-        className={`w-full h-full bg-dark-card rounded-2xl p-6 transition-all border text-left relative overflow-hidden flex flex-col ${disabled
-          ? 'border-dark-surface opacity-50 cursor-not-allowed'
-          : 'border-dark-surface hover:border-accent-green hover:shadow-[0_0_20px_-5px_rgba(163,230,53,0.3)] cursor-pointer'
-          }`}
-      >
-        {/* Hover Gradient Effect */}
-        {!disabled && (
-          <div className="absolute inset-0 bg-gradient-to-br from-accent-green/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-        )}
-
-        {/* Badge */}
-        {badge && (
-          <div
-            className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold border z-10 ${status === 'ready'
-              ? 'bg-accent-green/10 text-accent-green border-accent-green/20'
-              : 'bg-dark-surface text-text-muted border-white/5'
-              }`}
-          >
-            {badge}
-          </div>
-        )}
-
-        <div className='flex items-start gap-4 z-10'>
-          <div
-            className={`p-3 rounded-xl bg-dark-surface text-accent-green group-hover:bg-accent-green group-hover:text-black transition-colors duration-300`}
-          >
-            {icon}
-          </div>
-          <div className='flex-1 min-w-0'>
-            <h3 className='text-lg font-bold text-text-main mb-2 leading-tight group-hover:text-accent-green transition-colors'>
-              {title}
-            </h3>
-            <p className='text-sm text-text-muted leading-relaxed'>
-              {description}
-            </p>
-          </div>
-        </div>
-
-        {/* Disabled Reasons */}
-        {disabled && disabledReasons && disabledReasons.length > 0 && (
-          <div className='mt-4 pt-4 border-t border-white/5 space-y-2 z-10'>
-            {disabledReasons.map((reason, idx) => (
-              <div
-                key={idx}
-                className='flex items-center gap-2 text-xs text-red-400'
-              >
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  viewBox='0 0 24 24'
-                  fill='currentColor'
-                  className='w-4 h-4 flex-shrink-0'
-                >
-                  <path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z' />
-                </svg>
-                <span>{reason}</span>
-              </div>
-            ))}
-          </div>
-        )}
-      </button>
-    </div>
-  )
+  participants: Participant[];
+  templates: TemplateInfo[];
+  generatedCount: number;
+  onQuickAction: (action: string) => void;
+  selectedTemplate?: TemplateInfo | null;
+  recentProjects?: import("../types").RecentProject[];
+  onOpenProject?: (project: import("../types").RecentProject) => void;
+  onNewProject?: () => void;
 }
 
 export const Dashboard = ({
   participants,
   templates,
   generatedCount,
-  onQuickAction,
-  selectedTemplate,
+  recentProjects,
+  onOpenProject,
+  onNewProject,
 }: DashboardProps) => {
   const recentActivity = useMemo(() => {
     const activities: Array<{
-      text: string
-      time: string
-      icon: React.ReactNode
-      color: string
-    }> = []
+      text: string;
+      time: string;
+      icon: React.ReactNode;
+      color: string;
+    }> = [];
 
     if (participants.length > 0) {
       activities.push({
         text: `Zaimportowano ${participants.length} uczestników`,
-        time: 'Dzisiaj',
+        time: "Dzisiaj",
         icon: (
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            viewBox='0 0 24 24'
-            fill='currentColor'
-            className='w-5 h-5'
-          >
-            <path d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z' />
-          </svg>
+          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-4 h-4"
+            >
+              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+            </svg>
+          </div>
         ),
-        color: 'text-blue-600',
-      })
+        color: "text-gray-900",
+      });
     }
 
     if (generatedCount > 0) {
       activities.push({
         text: `Wygenerowano ${generatedCount} certyfikatów`,
-        time: 'Dzisiaj',
+        time: "Dzisiaj",
         icon: (
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            viewBox='0 0 24 24'
-            fill='currentColor'
-            className='w-5 h-5'
-          >
-            <path d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z' />
-          </svg>
+          <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-4 h-4"
+            >
+              <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+            </svg>
+          </div>
         ),
-        color: 'text-green-600',
-      })
+        color: "text-gray-900",
+      });
     }
 
-    if (templates.length > 0) {
+    // Default "welcome" activity if empty
+    if (activities.length === 0) {
       activities.push({
-        text: `Dostępnych ${templates.length} szablonów`,
-        time: 'Aktualnie',
+        text: "Witaj w nowym dashboardzie!",
+        time: "Teraz",
         icon: (
-          <svg
-            xmlns='http://www.w3.org/2000/svg'
-            viewBox='0 0 24 24'
-            fill='currentColor'
-            className='w-5 h-5'
-          >
-            <path d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z' />
-          </svg>
+          <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-4 h-4"
+            >
+              <path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
+            </svg>
+          </div>
         ),
-        color: 'text-purple-600',
-      })
+        color: "text-gray-900",
+      });
     }
 
-    return activities
-  }, [participants, generatedCount, templates])
+    return activities;
+  }, [participants, generatedCount]);
 
   return (
-    <div className='min-h-screen bg-dark-bg p-6 flex flex-col gap-6 items-center justify-center p-8'>
-      <div className="w-full max-w-5xl space-y-6">
-        {/* Header */}
-        <header className='bg-dark-card rounded-2xl p-8 border border-dark-surface shadow-sm'>
-          <div>
-            <h1 className='text-3xl font-bold text-white mb-2'>
-              Generator Certyfikatów
-            </h1>
-            <p className='text-text-muted'>
-              Witaj! Zarządzaj swoimi certyfikatami w jednym miejscu
-            </p>
+    <div className="w-full">
+      {/* Top Header */}
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Witaj! 👋
+          </h1>
+          <p className="text-gray-500 mt-1">
+            Oto co dzieje się dzisiaj w Twoich certyfikatach.
+          </p>
+        </div>
+      </header>
+
+      {/* Stats Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="flex items-start justify-between mb-4">
+            <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-6 h-6"
+              >
+                <path d="M4.5 6.375a4.125 4.125 0 1 1 8.25 0 4.125 4.125 0 0 1-8.25 0ZM14.25 8.625a3.375 3.375 0 1 1 6.75 0 3.375 3.375 0 0 1-6.75 0ZM1.5 19.125a7.125 7.125 0 0 1 14.25 0v.003l-.001.119a.75.75 0 0 1-.363.63 13.067 13.067 0 0 1-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 0 1-.364-.63l-.001-.122ZM17.25 19.128l-.001.144a2.25 2.25 0 0 1-.233.96 10.088 10.088 0 0 0 5.06-4.42 6.753 6.753 0 0 1-4.825 3.316Z" />
+              </svg>
+            </div>
+            <span className="text-xs font-semibold bg-green-100 text-green-700 px-2 py-1 rounded-full">
+              +12%
+            </span>
           </div>
-        </header>
-
-        {/* Action Cards */}
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-          <QuickAction
-            title={
-              participants.length > 0
-                ? participants.length <= 3
-                  ? participants.map((p) => p.name).join(', ')
-                  : `${participants
-                    .slice(-3)
-                    .map((p) => p.name)
-                    .join(', ')}...`
-                : 'Zarządzanie Uczestnikami'
-            }
-            description={
-              participants.length > 0
-                ? 'Zarządzaj listą, edytuj dane lub dodaj nowych.'
-                : 'Zaimportuj listę z CSV/Excel.'
-            }
-            badge={
-              participants.length > 0
-                ? `${participants.length} osób`
-                : undefined
-            }
-            status={participants.length > 0 ? 'ready' : 'info'}
-            icon={
-              <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-6 h-6'>
-                <path d='M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z' />
-              </svg>
-            }
-            onClick={() =>
-              participants.length > 0
-                ? onQuickAction('manage-participants')
-                : onQuickAction('import-csv')
-            }
-          />
-
-          <QuickAction
-            title={
-              selectedTemplate
-                ? selectedTemplate.name
-                : 'Wybierz Szablon'
-            }
-            description={
-              selectedTemplate
-                ? 'Szablon wybrany. Kliknij aby zmienić.'
-                : 'Przeglądaj galerię i wybierz wzór.'
-            }
-            icon={
-              <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-6 h-6'>
-                <path d='M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z' />
-              </svg>
-            }
-            onClick={() => onQuickAction('templates')}
-          />
-
-          <QuickAction
-            title='Generuj Certyfikaty'
-            description='Edytor wizualny i pobieranie PDF.'
-            // Color prop removed
-            color=""
-            icon={
-              <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-6 h-6'>
-                <path d='M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z' />
-              </svg>
-            }
-            onClick={() => onQuickAction('generate')}
-            disabled={!(participants.length > 0 && selectedTemplate)}
-            disabledReasons={[
-              ...(participants.length === 0 ? ['Brak uczestników'] : []),
-              ...(!selectedTemplate ? ['Brak szablonu'] : []),
-            ].filter(Boolean)}
-          />
-
-          <QuickAction
-            title='Eksportuj ZIP'
-            description='Pobierz wszystkie jako ZIP.'
-            // Color prop removed
-            color=""
-            icon={
-              <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-6 h-6'>
-                <path d='M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z' />
-              </svg>
-            }
-            onClick={() => onQuickAction('export-zip')}
-            disabled={!(participants.length > 0 && selectedTemplate)}
-            disabledReasons={[
-              ...(participants.length === 0 ? ['Brak uczestników'] : []),
-              ...(!selectedTemplate ? ['Brak szablonu'] : []),
-            ].filter(Boolean)}
-          />
+          <div>
+            <p className="text-gray-500 text-sm font-medium">Uczestnicy</p>
+            <h3 className="text-3xl font-bold text-gray-900">
+              {participants.length}
+            </h3>
+          </div>
         </div>
 
-        {/* Info Section */}
-        <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
-          {/* Recent Activity */}
-          <div className='bg-dark-card rounded-2xl p-6 border border-dark-surface h-full'>
-            <h3 className='text-lg font-bold text-white mb-4 flex items-center gap-2'>
-              <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' className='w-5 h-5 text-accent-green'>
-                <path d='M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z' />
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="flex items-start justify-between mb-4">
+            <div className="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M7.502 6h7.128A3.375 3.375 0 0 1 18 9.375v9.375a3 3 0 0 0 3-3V6.108c0-1.505-1.125-2.811-2.664-2.94a48.972 48.972 0 0 0-.673-.05A3 3 0 0 0 15 1.5h-1.5a3 3 0 0 0-2.663 1.618c-.225.015-.45.032-.673.05C8.662 3.295 7.554 4.542 7.502 6ZM13.5 1.5h-3c.22.015.44.032.66.05H12c.22-.018.44-.035.66-.05Z"
+                  clipRule="evenodd"
+                />
+                <path
+                  fillRule="evenodd"
+                  d="M15 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-6 6m6-6v9a6 6 0 0 1-6-6m0 0a6 6 0 0 1-6 6m6-6v9a6 6 0 0 1-6-6m0 0a6 6 0 0 1-6 6m6-6c0 3.314-2.686 6-6 6"
+                  clipRule="evenodd"
+                />
+                <path d="M12 5.25a3 3 0 0 1 3 3v9.375a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V8.25a3.375 3.375 0 0 1 3.375-3.375H12Z" />
               </svg>
-              Ostatnia Aktywność
+            </div>
+            <span className="text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+              Ogółem
+            </span>
+          </div>
+          <div>
+            <p className="text-gray-500 text-sm font-medium">Wygenerowano</p>
+            <h3 className="text-3xl font-bold text-gray-900">
+              {generatedCount}
             </h3>
-            {recentActivity.length > 0 ? (
-              <div className='space-y-3'>
-                {recentActivity.map((activity, idx) => (
-                  <div key={idx} className='flex items-start gap-3 p-3 rounded-xl bg-dark-bg/50 border border-white/5'>
-                    <div className='text-accent-green mt-0.5'>{activity.icon}</div>
-                    <div>
-                      <p className='text-sm font-medium text-white'>{activity.text}</p>
-                      <p className='text-xs text-text-muted'>{activity.time}</p>
+          </div>
+        </div>
+
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+          <div className="flex items-start justify-between mb-4">
+            <div className="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M3 6a3 3 0 0 1 3-3h2.25a3 3 0 0 1 3 3v2.25a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6Zm9.75 0a3 3 0 0 1 3-3H18a3 3 0 0 1 3 3v2.25a3 3 0 0 1-3 3h-2.25a3 3 0 0 1-3-3V6ZM3 15.75a3 3 0 0 1 3-3h2.25a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-2.25Zm9.75 0a3 3 0 0 1 3-3H18a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-2.25a3 3 0 0 1-3-3v-2.25Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <span className="text-xs font-semibold bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+              Dostępne
+            </span>
+          </div>
+          <div>
+            <p className="text-gray-500 text-sm font-medium">Szablony</p>
+            <h3 className="text-3xl font-bold text-gray-900">
+              {templates.length}
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Tabs */}
+      <div className="flex gap-6 flex-col xl:flex-row">
+        <div className="flex-1 space-y-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-gray-900">
+                Ostatnio Edytowane
+              </h2>
+              <button
+                onClick={onNewProject}
+                className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-4 py-2 rounded-lg hover:bg-indigo-100 transition-colors"
+              >
+                + Nowy Projekt
+              </button>
+            </div>
+
+            {recentProjects && recentProjects.length > 0 ? (
+              <div className="grid grid-cols-1 gap-4">
+                {recentProjects.map((project) => (
+                  <button
+                    key={project.id}
+                    onClick={() => onOpenProject && onOpenProject(project)}
+                    className="w-full bg-white border border-gray-200 rounded-xl p-4 hover:border-indigo-300 hover:shadow-md transition-all text-left flex items-center gap-4 group"
+                  >
+                    <div className="w-16 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center border border-gray-200">
+                      {project.templateThumbnail ? (
+                        <img
+                          src={project.templateThumbnail}
+                          alt={project.templateName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          className="w-6 h-6 text-gray-400"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M1.5 6a2.25 2.25 0 0 1 2.25-2.25h16.5A2.25 2.25 0 0 1 22.5 6v12a2.25 2.25 0 0 1-2.25 2.25H3.75A2.25 2.25 0 0 1 1.5 18V6ZM3 16.06V18c0 .414.336.75.75.75h16.5A.75.75 0 0 0 21 18v-1.94l-2.69-2.689a1.5 1.5 0 0 0-2.12 0l-.88.879.97.97a.75.75 0 1 1-1.06 1.06l-5.16-5.159a1.5 1.5 0 0 0-2.12 0L3 16.061Zm10.125-7.81a1.125 1.125 0 1 1 2.25 0 1.125 1.125 0 0 1-2.25 0Z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      )}
                     </div>
-                  </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                        {project.templateName}
+                      </h3>
+                      <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            className="w-3 h-3"
+                          >
+                            <path d="M7 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM14.5 9a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM1.615 16.428a1.224 1.224 0 0 1-.569-1.175 6.002 6.002 0 0 1 11.532-2.407.75.75 0 0 1-1.359.63A4.502 4.502 0 0 0 3.75 14.5a3.75 3.75 0 0 0-2.135.65.236.236 0 0 0 .142.406 2.08 2.08 0 0 0 1.956-1.168.75.75 0 1 1 1.354.636 3.58 3.58 0 0 1-3.452 1.404Z" />
+                          </svg>
+                          {project.participantsCount} os.
+                        </span>
+                        <span>•</span>
+                        <span>
+                          {new Date(project.lastEdited).toLocaleDateString(
+                            "pl-PL",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            },
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                      className="w-5 h-5 text-gray-300 group-hover:text-indigo-500 transform group-hover:translate-x-1 transition-all"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </button>
                 ))}
               </div>
             ) : (
-              <div className='text-center py-8 text-text-muted'>
-                <p className='text-sm'>Brak aktywności</p>
+              <div className="text-center py-10">
+                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-8 h-8"
+                  >
+                    <path d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625ZM7.5 15a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 7.5 15Zm.75 2.25a.75.75 0 0 0 0 1.5H12a.75.75 0 0 0 0-1.5H8.25Z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-1">
+                  Brak ostatnich projektów
+                </h3>
+                <p className="text-gray-500 mb-6 max-w-xs mx-auto text-sm">
+                  Rozpocznij pracę wybierając nowy projekt, a Twoja historia
+                  pojawi się tutaj.
+                </p>
+                <button
+                  onClick={onNewProject}
+                  className="bg-indigo-600 text-white px-6 py-2.5 rounded-lg hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 font-bold"
+                >
+                  Rozpocznij Projekt
+                </button>
               </div>
             )}
           </div>
+        </div>
 
-          {/* Tips */}
-          <div className='bg-gradient-to-br from-dark-surface to-dark-card rounded-2xl p-6 border border-dark-surface h-full'>
-            <h3 className='text-lg font-bold text-white mb-4 flex items-center gap-2'>
-              <span className="text-xl">💡</span> Wskazówki
+        {/* Right Column (Activity) */}
+        <div className="w-full xl:w-96 flex-shrink-0">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full">
+            <h3 className="text-lg font-bold text-gray-900 mb-6">
+              Ostatnia Aktywność
             </h3>
-            <div className='space-y-3'>
-              <div className='p-3 rounded-xl bg-accent-green/10 border border-accent-green/20'>
-                <p className='font-bold text-sm text-accent-green mb-1'>Skróty</p>
-                <p className='text-xs text-text-muted'>Użyj Ctrl+D aby pobrać wszystkie.</p>
-              </div>
-              <div className='p-3 rounded-xl bg-white/5 border border-white/10'>
-                <p className='font-bold text-sm text-white mb-1'>Szablony</p>
-                <p className='text-xs text-text-muted'>Możesz wgrać własny plik SVG/PNG.</p>
-              </div>
+
+            <div className="space-y-6">
+              {recentActivity.map((item, idx) => (
+                <div key={idx} className="flex gap-4">
+                  <div className="flex-shrink-0 mt-1">{item.icon}</div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {item.text}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1">{item.time}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
-}
-}
+  );
+};

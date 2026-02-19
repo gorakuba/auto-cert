@@ -1,8 +1,10 @@
+import { createPortal } from "react-dom";
+
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   title: string;
-  message: string;
+  message?: string;
   type?: "info" | "success" | "warning" | "error";
   confirmText?: string;
   cancelText?: string;
@@ -18,201 +20,213 @@ export function Modal({
   confirmText = "OK",
   cancelText,
   onConfirm,
-}: ModalProps) {
+  children,
+  maxWidth = "max-w-sm",
+}: ModalProps & { children?: React.ReactNode; maxWidth?: string }) {
   if (!isOpen) return null;
 
-  const getIcon = () => {
-    switch (type) {
-      case "success":
-        return (
-          <div className="relative">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-in zoom-in duration-500">
-              <svg
-                className="w-12 h-12 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={3}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </div>
-            <div className="absolute inset-0 w-20 h-20 bg-green-400 rounded-full mx-auto animate-ping opacity-20"></div>
-          </div>
-        );
-      case "warning":
-        return (
-          <div className="relative">
-            <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-in zoom-in duration-500">
-              <svg
-                className="w-12 h-12 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={3}
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                />
-              </svg>
-            </div>
-            <div className="absolute inset-0 w-20 h-20 bg-yellow-400 rounded-full mx-auto animate-pulse opacity-20"></div>
-          </div>
-        );
-      case "error":
-        return (
-          <div className="relative">
-            <div className="w-20 h-20 bg-gradient-to-br from-red-400 to-red-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-in zoom-in duration-500">
-              <svg
-                className="w-12 h-12 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={3}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </div>
-            <div className="absolute inset-0 w-20 h-20 bg-red-400 rounded-full mx-auto animate-ping opacity-20"></div>
-          </div>
-        );
-      default:
-        return (
-          <div className="relative">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-in zoom-in duration-500">
-              <svg
-                className="w-12 h-12 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={3}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            </div>
-            <div className="absolute inset-0 w-20 h-20 bg-blue-400 rounded-full mx-auto animate-pulse opacity-20"></div>
-          </div>
-        );
-    }
-  };
-
-  const getColors = () => {
+  const getTheme = () => {
     switch (type) {
       case "success":
         return {
-          gradient: "from-green-50 via-green-50 to-emerald-50",
-          border: "border-green-200",
-          button:
-            "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800",
-          text: "text-green-900",
-          accent: "bg-green-500",
+          iconBg: "bg-green-100",
+          iconColor: "text-green-600",
+          icon: (
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+          ),
+          button: "bg-green-600 hover:bg-green-700 ring-green-200",
         };
       case "warning":
         return {
-          gradient: "from-yellow-50 via-orange-50 to-yellow-50",
-          border: "border-yellow-300",
-          button:
-            "bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700",
-          text: "text-yellow-900",
-          accent: "bg-yellow-500",
+          iconBg: "bg-amber-100",
+          iconColor: "text-amber-600",
+          icon: (
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          ),
+          button: "bg-amber-600 hover:bg-amber-700 ring-amber-200",
         };
       case "error":
         return {
-          gradient: "from-red-50 via-red-50 to-pink-50",
-          border: "border-red-200",
-          button:
-            "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800",
-          text: "text-red-900",
-          accent: "bg-red-500",
+          iconBg: "bg-red-100",
+          iconColor: "text-red-600",
+          icon: (
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          ),
+          button: "bg-red-600 hover:bg-red-700 ring-red-200",
         };
       default:
         return {
-          gradient: "from-blue-50 via-indigo-50 to-blue-50",
-          border: "border-blue-200",
-          button:
-            "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700",
-          text: "text-blue-900",
-          accent: "bg-blue-500",
+          iconBg: "bg-blue-100",
+          iconColor: "text-blue-600",
+          icon: (
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          ),
+          button: "bg-blue-600 hover:bg-blue-700 ring-blue-200",
         };
     }
   };
 
-  const colors = getColors();
+  const theme = getTheme();
 
   const handleConfirm = () => {
-    if (onConfirm) {
-      onConfirm();
-    }
-    onClose();
+    if (onConfirm) onConfirm();
+    // Only close if no onConfirm (or if we want explicit close control, but typically confirm closes)
+    // However, existing usage implies close on confirm? No, existing usage: confirmDelete calls onClose internally if needed or just deletes.
+    // Wait, Check App.tsx or ParticipantsPage usage. `handleDelete` -> `setDeleteModal`. `confirmDelete` -> delete and `setDeleteModal(false)`.
+    // BUT the Modal logic in line 79 closes it: `onClose()`.
+    // If we want manual control (e.g. form validation fail), we shouldn't auto close.
+    // But for now let's stick to existing behavior unless manual add needs change.
+    // Manual add logic in ParticipantsPage: `confirmManualAdd` calls `setManualAddOpen(false)`.
+    // If Modal auto-closes on onConfirm, then it might be redundant or conflict.
+    // Let's modify handleConfirm to NOT call onClose if onConfirm is present, assuming onConfirm handles it?
+    // Or just leave it as is. Existing: `handleConfirm` -> `if(onConfirm) onConfirm(); onClose();`.
+    // If I want to validate form, I might not want to close.
+    // But for simplistic approach:
+    // If onConfirm is passed, it does logic. Then Modal closes.
+    // For Manual Add, I pass `onConfirm` which validates. If validation fails, it shows snackbar/returns.
+    // If it returns, Modal still closes if I keep `onClose()`.
+    if (shouldAutoClose) onClose();
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
+    if (e.target === e.currentTarget) onClose();
   };
 
-  return (
+  const shouldAutoClose = true;
+
+  return createPortal(
     <div
-      className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-200"
+      className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[5000] p-4 animate-in fade-in duration-200"
       onClick={handleBackdropClick}
+      style={{ animationFillMode: "both" }}
     >
       <div
-        className="bg-white rounded-3xl shadow-2xl max-w-md w-full transform transition-all animate-in fade-in zoom-in duration-300 overflow-hidden"
+        className={`bg-white rounded-2xl shadow-2xl w-full ${maxWidth} max-h-[90vh] flex flex-col transform transition-all animate-in zoom-in duration-300 overflow-hidden ring-1 ring-black/5`}
         onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
       >
-        {/* Decorative top accent bar */}
-        <div className={`h-2 ${colors.accent}`}></div>
-
-        {/* Header with gradient background */}
-        <div
-          className={`bg-gradient-to-br ${colors.gradient} p-8 border-b ${colors.border}`}
-        >
-          {getIcon()}
-          <h2 className={`text-2xl font-bold text-center ${colors.text} mb-1`}>
-            {title}
-          </h2>
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white flex-shrink-0">
+          <h3 className="text-lg font-bold text-gray-900 leading-6">{title}</h3>
+          <button
+            onClick={onClose}
+            className="p-2 -mr-2 text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-gray-100"
+            aria-label="Zamknij"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-5 h-5"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
         </div>
 
         {/* Content */}
-        <div className="p-8 bg-white">
-          <p className="text-gray-700 text-center leading-relaxed whitespace-pre-line text-base">
-            {message}
-          </p>
+        <div className="p-6 overflow-y-auto flex-1">
+          <div className="flex flex-col gap-5">
+            {/* Show icon only if it's an alert-style message without complex children, or if explicitly desired. 
+                For cleanliness, let's show Icon + Message at top if message exists. */}
+            {(message && type !== "info") || (message && type === "info") ? (
+              <div className="flex items-center gap-4 mb-4">
+                {type !== "info" && (
+                  <div
+                    className={`p-3 rounded-full h-fit w-fit flex-shrink-0 ${theme.iconBg} ${theme.iconColor}`}
+                  >
+                    {theme.icon}
+                  </div>
+                )}
+                {message && (
+                  <p className="text-sm text-gray-500 leading-relaxed text-balance">
+                    {message}
+                  </p>
+                )}
+              </div>
+            ) : null}
+
+            {children && <div className="w-full">{children}</div>}
+          </div>
         </div>
 
-        {/* Footer with buttons */}
-        <div className="p-6 bg-gray-50 flex gap-3">
-          {cancelText && (
-            <button
-              onClick={onClose}
-              className="flex-1 px-6 py-3.5 border-2 border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-white hover:border-gray-400 transition-all duration-200 transform hover:scale-105"
-            >
-              {cancelText}
-            </button>
-          )}
-          <button
-            onClick={handleConfirm}
-            className={`flex-1 px-6 py-3.5 ${colors.button} text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-2xl transform hover:scale-105`}
-          >
-            {confirmText}
-          </button>
-        </div>
+        {/* Footer */}
+        {(cancelText || onConfirm) && (
+          <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-3 flex-shrink-0">
+            {cancelText && (
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 text-gray-700 bg-white rounded-lg text-sm font-medium transition-all shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+              >
+                {cancelText}
+              </button>
+            )}
+            {onConfirm && (
+              <button
+                onClick={handleConfirm}
+                className={`px-4 py-2 text-white rounded-lg text-sm font-medium transition-all shadow-sm focus:ring-2 focus:ring-offset-2 ${theme.button}`}
+              >
+                {confirmText}
+              </button>
+            )}
+          </div>
+        )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

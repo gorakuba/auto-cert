@@ -215,14 +215,14 @@ export const ZipExporter = ({
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[5000] p-6 animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden ring-1 ring-black/5 animate-in zoom-in-95 duration-300">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">
+        <div className="px-8 py-6 border-b border-gray-50 bg-white">
+          <h2 className="text-xl font-bold text-gray-900 tracking-tight">
             Eksportowanie do ZIP
           </h2>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-gray-500 mt-1">
             Trwa generowanie {participants.length} certyfikatów PDF...
           </p>
         </div>

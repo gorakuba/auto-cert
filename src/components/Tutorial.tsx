@@ -152,7 +152,7 @@ export function Tutorial({ onComplete, templates }: TutorialProps) {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            🎓 Witaj w Auto-Cert!
+            🎓 Witaj w AutoCert!
           </h1>
           <p className="text-lg text-gray-600">
             Utwórz swoje pierwsze certyfikaty w 3 prostych krokach
@@ -171,21 +171,19 @@ export function Tutorial({ onComplete, templates }: TutorialProps) {
             {[1, 2, 3].map((step, idx) => (
               <div key={step} className="flex items-center">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all ${
-                    step === currentStep
+                  className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg transition-all ${step === currentStep
                       ? "bg-blue-600 text-white shadow-lg scale-110"
                       : step < currentStep
                         ? "bg-green-600 text-white"
                         : "bg-gray-200 text-gray-600"
-                  }`}
+                    }`}
                 >
                   {step < currentStep ? "✓" : step}
                 </div>
                 {idx < 2 && (
                   <div
-                    className={`w-16 h-1 mx-2 ${
-                      step < currentStep ? "bg-green-600" : "bg-gray-200"
-                    }`}
+                    className={`w-16 h-1 mx-2 ${step < currentStep ? "bg-green-600" : "bg-gray-200"
+                      }`}
                   />
                 )}
               </div>
@@ -297,11 +295,10 @@ export function Tutorial({ onComplete, templates }: TutorialProps) {
                   <button
                     key={template.id}
                     onClick={() => setSelectedTemplate(template)}
-                    className={`p-6 border-2 rounded-xl text-left transition-all hover:shadow-lg ${
-                      selectedTemplate?.id === template.id
+                    className={`p-6 border-2 rounded-xl text-left transition-all hover:shadow-lg ${selectedTemplate?.id === template.id
                         ? "border-purple-600 bg-purple-50 shadow-lg"
                         : "border-gray-200 hover:border-purple-300"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">

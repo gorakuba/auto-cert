@@ -20,3 +20,13 @@ export interface TemplateInfo {
   createdAt?: number;
   tags?: string[];
 }
+
+export interface RecentProject {
+  id: string;
+  templateId: string;
+  templateName: string;
+  templateThumbnail: string; // Add this to show preview
+  participants: Participant[];
+  participantsCount: number;
+  lastEdited: number; // timestamp
+}

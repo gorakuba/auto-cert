@@ -1,7 +1,6 @@
-// Dashboard Only - Minimal Export
-
 export { CertificateGenerator } from "./CertificateGenerator";
 export { Dashboard } from "./Dashboard";
+export { Layout } from "./Layout";
 export { Modal } from "./Modal";
 export { Snackbar } from "./Snackbar";
 export { TemplateSelector } from "./TemplateSelector";

@@ -8,10 +8,10 @@ Nowoczesna aplikacja do generowania certyfikatów z podglądem na żywo, eksport
 
 ```bash
 # Instalacja
-npm install
+yarn
 
 # Uruchomienie
-npm run dev
+yarn dev
 
 # Otwórz http://localhost:5173
 ```
@@ -135,13 +135,13 @@ git clone https://github.com/gorakuba/auto-cert.git
 cd auto-cert
 
 # Instalacja zależności
-npm install
+yarn
 
 # Uruchomienie w trybie deweloperskim
-npm start
+yarn dev
 
 # Budowanie wersji produkcyjnej
-npm run build
+yarn build
 ```
 
 ## 📦 Technologie
