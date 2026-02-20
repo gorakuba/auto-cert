@@ -1,0 +1,15 @@
+node_modules
+npm-debug.log
+yarn-error.log
+.git
+.idea
+.vscode
+dist
+dist-ssr
+bin
+obj
+*.db
+*.db-shm
+*.db-wal
+tests
+coverage

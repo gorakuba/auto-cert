@@ -7,10 +7,25 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# API
+apps/api/AutoCert.Api/bin/
+apps/api/AutoCert.Api/obj/
+apps/api/AutoCert.Tests/bin/
+apps/api/AutoCert.Tests/obj/
+auto-cert.db
+auto-cert.db-shm
+auto-cert.db-wal
+
+# Web
+apps/web/dist/
+apps/web/dist-ssr/
+apps/web/e2e/test-results/
+apps/web/e2e/playwright-report/
+apps/web/playwright-report/
+apps/web/test-results/
+
 node_modules
 dist
-dist-ssr
-*.local
 
 # Editor directories and files
 .vscode/*

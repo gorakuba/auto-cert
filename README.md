@@ -127,65 +127,74 @@ yarn dev
 
 ## 🛠️ Instalacja i Uruchomienie
 
+### Wymagania
+- **Node.js 18+**
+- **Yarn**
+- **.NET 9.0 SDK**
+
 ```bash
 # Klonowanie repozytorium
 git clone https://github.com/gorakuba/auto-cert.git
-
-# Przejście do katalogu
 cd auto-cert
 
-# Instalacja zależności
+# Instalacja zależności (wspólna dla frontend)
 yarn
 
-# Uruchomienie w trybie deweloperskim
+# Uruchomienie w trybie deweloperskim (Frontend + Backend)
+# Uruchamia:
+# - Frontend: http://localhost:5173
+# - Backend: http://localhost:5050 (Swagger: /swagger)
 yarn dev
 
 # Budowanie wersji produkcyjnej
-yarn build
+yarn web:build
+dotnet build apps/backend/AutoCert.Backend
+
+# Uruchomienie przez Docker (Produkcja)
+docker-compose up --build
 ```
 
 ## 📦 Technologie
 
-- **React 19.1.0** - nowoczesny framework UI
-- **TypeScript 5.8.3** - bezpieczne typowanie
-- **Tailwind CSS 4.1.8** - utility-first styling
-- **Vite 6.3.5** - szybki build tool
-- **JSZip** - pakowanie archiwów ZIP
-- **localStorage API** - przechowywanie lokalnie
+### Frontend (`apps/web-app`)
+- **React 19**
+- **TypeScript 5.8**
+- **Tailwind CSS 4.0**
+- **Vite 6**
+- **Playwright** (E2E)
 
-## 📁 Struktura Projektu
+### Backend (`apps/backend`)
+- **.NET 9 (ASP.NET Core Minimal APIs)**
+- **Entity Framework Core**
+- **SQLite**
+- **Swagger/OpenAPI**
+
+## 📁 Struktura Projektu (Monorepo)
 
 ```
 auto-cert/
-├── public/
-│   └── templates/                    # Szablony SVG
-│       ├── template1.svg
-│       ├── template2.svg
-│       └── template3.svg
-├── src/
-│   ├── App.tsx                       # Główny komponent + logika
-│   ├── components/
-│   │   ├── Dashboard.tsx             # Dashboard z kartami
-│   │   ├── SimpleCSVImporter.tsx     # Import CSV
-│   │   ├── SimpleParticipantManager.tsx  # Zarządzanie uczestnikami
-│   │   ├── TemplateSelector.tsx      # Wybór szablonów
-│   │   ├── CertificateGenerator.tsx  # Generator z podglądem
-│   │   ├── ZipExporter.tsx           # Eksport do ZIP
-│   │   └── index.ts                  # Exports
-│   ├── main.tsx                      # Entry point
-│   └── index.css                     # Globalne style
-├── package.json
-├── tsconfig.json
+├── apps/
+│   ├── web-app/                  # Frontend (React + Vite)
+│   │   ├── src/
+│   │   ├── e2e/             # Testy E2E (Playwright)
+│   │   └── package.json
+│   └── api/                  # Backend (.NET)
+│       ├── AutoCert.Backend/
+│       ├── AutoCert.Tests/
+│       └── AutoCert.Backend.sln
+├── package.json              # Root (Yarn Workspaces)
 └── README.md
 ```
 
-## 💾 localStorage
+## 💾 Przechowywanie Danych
 
-Dane przechowywane lokalnie w przeglądarce:
+Dane są przechowywane w lokalnej bazie danych **SQLite** (`auto-cert.db`) obsługiwanej przez backend .NET.
 
-- `auto-cert-participants` - lista uczestników (Participant[])
-- `auto-cert-generated-count` - licznik wygenerowanych certyfikatów
-- `auto-cert-custom-templates` - własne szablony (TemplateInfo[])
+- **Uczestnicy**: Tabela `Participants`
+- **Ustawienia**: Tabela `Settings` (status tutoriala, wybrany szablon)
+- **Historia**: Przechowywana w bazie
+
+Frontend komunikuje się z bazą poprzez REST API (`/api/participants`, `/api/settings`).
 
 ## 🎨 Customizacja
 
@@ -231,12 +240,3 @@ Projekt prywatny - **Kuba Góra**
 ## 👨‍💻 Autor
 
 **Kuba Góra** - [@gorakuba](https://github.com/gorakuba)
-
----
-
-**Stworzone z ❤️ dla łatwego generowania certyfikatów**
-Jeśli podoba Ci się ten projekt, zostaw gwiazdkę na GitHubie!
-
----
-
-Stworzone z ❤️ dla potrzeb generowania certyfikatów

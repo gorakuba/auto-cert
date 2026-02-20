@@ -6,17 +6,17 @@ It operates entirely client-side, prioritizing user privacy by processing all da
 Key features include CSV/XLSX import, a WYSIWYG certificate editor with live preview, template management, and bulk ZIP export.
 
 ## 🛠 Tech Stack
--   **Core**: React 19, TypeScript 5.8
--   **Build**: Vite 6.3
--   **Styling**: Tailwind CSS v4.1 (@tailwindcss/vite plugin)
--   **Package Manager**: Yarn (v1.22) — use `yarn`, NOT `npm`
--   **State Management**: React `useState` + `localStorage` persistence
--   **Routing**: Custom tab-based navigation (SPA) managed in `App.tsx`
+-   **Frontend**: React 19, TypeScript 5.8, Tailwind CSS v4.1, Vite 6.3
+-   **Backend**: .NET 9 (ASP.NET Core Minimal APIs), Entity Framework Core, SQLite
+-   **Package Manager**: Yarn (Workspaces)
+-   **State Management**: React `useState` + API synchronization
 -   **Testing**:
-    -   **Unit/Component**: Vitest + React Testing Library (@testing-library/react)
-    -   **E2E**: Playwright (@playwright/test) — Chromium, 1920×1080 viewport
+    -   **Unit**: Vitest (Frontend), xUnit (Backend)
+    -   **E2E**: Playwright
 
 ### Key Dependencies
+-   `swashbuckle.aspnetcore`: Swagger UI
+-   `microsoft.entityframeworkcore.sqlite`: Database provider
 -   `jszip`: creating ZIP archives of generated PDFs.
 -   `jspdf`: Generating PDF documents from canvas/images.
 -   `xlsx`: Parsing Excel (.xlsx) files.
@@ -24,75 +24,41 @@ Key features include CSV/XLSX import, a WYSIWYG certificate editor with live pre
 -   `react-icons`: Icon set (FaTrash, etc.).
 -   `dom-to-image-more` / `html2canvas`: Canvas rendering helpers.
 
-## 📂 Project Structure
+## 📂 Project Structure (Monorepo)
 ```
 auto-cert/
-├── src/
-│   ├── App.tsx             # ROOT COMPONENT: Global state, routing, persistence.
-│   ├── types.ts            # DATA MODELS: Participant, TemplateInfo, RecentProject.
-│   ├── main.tsx            # Entry point.
-│   ├── components/         # PRESENTATIONAL & FEATURE COMPONENTS
-│   │   ├── CertificateGenerator.tsx  # Canvas editor, PDF generation.
-│   │   ├── ZipExporter.tsx           # Bulk export (JSZip) — auto-starts on mount.
-│   │   ├── Dashboard.tsx             # Main dashboard view.
-│   │   ├── Layout.tsx                # App shell (Sidebar + content).
-│   │   ├── Sidebar.tsx               # Navigation with participant/template badges.
-│   │   ├── Modal.tsx                 # Reusable modal (React Portal, z-[5000]).
-│   │   ├── Snackbar.tsx              # Notification toast.
-│   │   ├── SearchToolbar.tsx         # Search & filter UI.
-│   │   └── CSVImporter/
-│   │       └── CSVImporterUI.tsx     # Import UI via createPortal (z-[5001]).
-│   ├── containers/
-│   │   ├── SimpleCSVImporter/        # File parsing logic (FileReader, XLSX).
-│   │   └── ParticipantManager/       # Participant list operations.
-│   ├── pages/
-│   │   ├── ParticipantsPage.tsx      # CRUD table view for participants.
-│   │   ├── TemplatesPage.tsx         # Template grid, selection, upload.
-│   │   └── ProjectsPage.tsx          # Recent project history.
-│   └── index.css           # Global styles & Tailwind directives.
-├── tests/                  # ALL test infrastructure in one place
-│   ├── e2e/                # Playwright E2E specs (one folder per feature)
-│   │   ├── dashboard/
-│   │   │   └── screenshots/          # Auto-saved screenshots per run
-│   │   ├── export/screenshots/
-│   │   ├── generator/screenshots/
-│   │   ├── participants/screenshots/
-│   │   ├── templates/screenshots/
-│   │   ├── tutorial/screenshots/
-│   │   ├── dashboard.spec.ts
-│   │   ├── export.spec.ts
-│   │   ├── generator.spec.ts
-│   │   ├── participants.spec.ts
-│   │   ├── templates.spec.ts
-│   │   └── tutorial.spec.ts
-│   ├── test-results/       # Playwright run artifacts (auto-generated)
-│   └── playwright-report/  # HTML report (auto-generated)
-├── public/
-│   └── templates/          # Default SVG templates (t1, t2, t3).
-├── vitest-setup.ts         # Vitest global setup (mocks: localStorage, Canvas, URL)
-├── vitest.config.ts
-├── playwright.config.ts
-├── yarn.lock
-└── package.json
+├── apps/
+│   ├── web-app/                    # FRONTEND (React + Vite)
+│   │   ├── src/
+│   │   │   ├── services/           # API wrapper (api.ts)
+│   │   │   └── ...                 # Components, Pages, etc.
+│   │   ├── e2e/                    # Playwright E2E tests
+│   │   │   ├── tests/              # Spec files
+│   │   │   └── playwright.config.ts
+│   │   ├── package.json
+│   │   └── vite.config.ts
+│   └── backend/                    # BACKEND (.NET 9)
+│       ├── AutoCert.Backend/           # API Project
+│       │   ├── Endpoints/          # Minimal API endpoints
+│       │   ├── Data/               # DB Context & Models
+│       │   └── Program.cs          # Config
+│       └── AutoCert.Tests/         # Integration Tests (xUnit)
+├── package.json                    # Root workspace config
+└── README.md
 ```
 
 ## 🧠 Application Architecture & State
 
 ### Global State (`App.tsx`)
-The application uses a **centralized state** pattern lifted up to `App.tsx`.
--   `participants`: `Participant[]` — people to generate certificates for.
--   `templates`: `TemplateInfo[]` — available designs (Default + Custom).
--   `selectedTemplate`: `TemplateInfo | null` — currently active design.
--   `activeTab`: `string` — current view (`dashboard` | `participants` | `templates` | `generator` | `projects`).
--   `recentProjects`: `RecentProject[]` — history of work sessions.
+The application accesses data via `src/services/api.ts` which communicates with the backend.
+-   `participants`: Loaded from `GET /api/participants`
+-   `settings`: Loaded from `GET /api/settings/{key}`
 
-### Data Persistence (`localStorage` keys)
--   `auto-cert-participants` — JSON array of current participants.
--   `auto-cert-custom-templates` — JSON array of user-uploaded templates (Base64 DataURLs).
--   `auto-cert-selected-template` — JSON of selected template object.
--   `auto-cert-generated-count` — total certificates generated counter.
--   `auto-cert-recent-projects` — JSON array of saved project history.
--   `auto-cert-tutorial-completed` — `"true"` when onboarding is done.
+### Data Persistence (SQLite)
+Data is stored in `auto-cert.db` (SQLite) via Entity Framework Core.
+-   **Participants**: `Participants` table.
+-   **Settings**: `Settings` table (Key-Value store for `tutorial_completed`, `selected_template`, etc).
+-   **Legacy**: `localStorage` is used only for UI preferences or temporary state (e.g. `activeTab`).
 
 ## 🔑 Key Features Implementation Details
 
@@ -136,10 +102,10 @@ The application uses a **centralized state** pattern lifted up to `App.tsx`.
 -   **Run**: `yarn test`
 
 ### E2E Tests (Playwright)
--   **Config**: `playwright.config.ts`
-    -   `testDir`: `./tests/e2e`
-    -   `outputDir`: `./tests/test-results`
-    -   HTML report: `./tests/playwright-report`
+-   **Config**: `apps/web/playwright.config.ts`
+    -   `testDir`: `./e2e/tests`
+    -   `outputDir`: `./e2e/test-results`
+    -   HTML report: `./e2e/playwright-report`
     -   Viewport: **1920×1080**
     -   Web server: `yarn dev` on `http://localhost:5173`
 -   **Isolation strategy**: inject `auto-cert-tutorial-completed = "true"` via `page.evaluate()` in `beforeEach`, then `page.reload()` + `waitForLoadState("networkidle")`.
@@ -169,10 +135,21 @@ The application uses a **centralized state** pattern lifted up to `App.tsx`.
 
 ## 🚀 Development Commands
 ```bash
-yarn dev          # Start local dev server (http://localhost:5173)
-yarn build        # Production build
-yarn test         # Vitest unit/component tests
-yarn test:ui      # Vitest with UI
-yarn test:e2e     # Playwright E2E tests (starts dev server automatically)
-yarn check        # Biome lint + format check
+# Start Development Server
+# Frontend (`apps/web-app`): http://localhost:5173
+# Backend: http://localhost:5050
+yarn dev
+
+# Run E2E Tests (Playwright)
+yarn web-app:e2e
+
+# Run Frontend Unit Tests
+yarn web:test
+
+# Run Backend Tests
+dotnet test apps/backend/AutoCert.Tests
+
+# Build Producton
+yarn web:build
+dotnet build apps/backend/AutoCert.Backend
 ```
