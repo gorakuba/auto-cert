@@ -5,14 +5,16 @@ import { snapshot } from "../../helpers/screenshot";
 const SCREENSHOT_DIR = path.join("tests", "e2e", "generator", "screenshots");
 
 test.describe("Generator Feature", () => {
-  test.beforeEach(async ({ page, request }) => {
-    // 1. Skip tutorial
-    await request.put("/api/settings/auto-cert-tutorial-completed", {
-      data: { value: "true" }
+  test.beforeEach(async ({ page, context, request }) => {
+    // 1. Skip tutorial via localStorage
+    await context.addInitScript(() => {
+      window.localStorage.setItem("auto-cert-tutorial-completed", "true");
     });
 
     // 2. Clear data
     await request.delete("/api/participants");
+    await request.put("/api/settings/auto-cert-recent-projects", { data: { value: "" } });
+    await request.put("/api/settings/auto-cert-custom-templates", { data: { value: "[]" } });
 
     await page.goto("/");
     await page.waitForLoadState("networkidle");

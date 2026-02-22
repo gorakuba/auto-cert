@@ -5,12 +5,14 @@ import { snapshot } from "../../helpers/screenshot";
 const SCREENSHOT_DIR = path.join("tests", "e2e", "tutorial", "screenshots");
 
 test.describe("Tutorial Flow", () => {
-  test.beforeEach(async ({ page, request }) => {
+  test.beforeEach(async ({ page, context, request }) => {
     // Reset state via API
     await request.delete("/api/participants");
-    // Set tutorial completed to empty string to force tutorial to show
-    await request.put("/api/settings/auto-cert-tutorial-completed", {
-      data: { value: "" }
+    await request.put("/api/settings/auto-cert-recent-projects", { data: { value: "" } });
+    await request.put("/api/settings/auto-cert-custom-templates", { data: { value: "[]" } });
+    // Clear tutorial completed from localStorage to force tutorial to show
+    await context.addInitScript(() => {
+      window.localStorage.removeItem("auto-cert-tutorial-completed");
     });
 
     await page.goto("/");

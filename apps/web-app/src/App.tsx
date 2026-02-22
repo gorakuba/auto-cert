@@ -20,6 +20,7 @@ import { api } from "./services/api";
 function App() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [participants, setParticipants] = useState<Participant[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [templates, setTemplates] = useState<TemplateInfo[]>([
     {
       id: "t1",
@@ -116,8 +117,8 @@ function App() {
   useEffect(() => {
     const initData = async () => {
       try {
-        // Load tutorial status
-        const tutorialCompleted = await api.settings.get(
+        // Load tutorial status (localStorage)
+        const tutorialCompleted = localStorage.getItem(
           "auto-cert-tutorial-completed",
         );
         if (!tutorialCompleted) {
@@ -126,9 +127,8 @@ function App() {
 
         // Load participants
         const backendParticipants = await api.participants.getAll();
-        if (backendParticipants.length > 0) {
-          setParticipants(backendParticipants);
-        }
+        setParticipants(backendParticipants);
+        setIsInitialized(true);
 
         // Load generated count
         const savedGenerated = await api.settings.get(
@@ -138,56 +138,54 @@ function App() {
           setGeneratedCount(parseInt(savedGenerated));
         }
 
-        // Load selected template (ID only or full object? Settings stores string value)
-        // We stored full JSON in settings value
+        // Load selected template
         const savedTemplateStr = await api.settings.get(
           "auto-cert-selected-template",
         );
         if (savedTemplateStr) {
-          setSelectedTemplate(JSON.parse(savedTemplateStr));
+          try {
+            setSelectedTemplate(JSON.parse(savedTemplateStr));
+          } catch (e) {
+            console.error(e);
+          }
+        }
+
+        // Load custom templates from API
+        const customTemplatesStr = await api.settings.get(
+          "auto-cert-custom-templates",
+        );
+        if (customTemplatesStr) {
+          try {
+            const customTemplates = JSON.parse(customTemplatesStr);
+            setTemplates((prev) => {
+              const ids = new Set(prev.map((t) => t.id));
+              const newCustoms = customTemplates.filter(
+                (t: TemplateInfo) => !ids.has(t.id),
+              );
+              return [...prev, ...newCustoms];
+            });
+          } catch (e) {
+            console.error("Failed to parse custom templates:", e);
+          }
         }
       } catch (e) {
-        console.error("Failed to initialize data from API:", e);
-        showSnackbar("Błąd ładowania danych z serwera", "error");
+        console.error("Failed to initialize data:", e);
+        showSnackbar("Błąd ładowania danych", "error");
       }
     };
 
     initData();
-
-    // Load custom templates (still localStorage)
-    const customTemplatesStr = localStorage.getItem(
-      "auto-cert-custom-templates",
-    );
-    if (customTemplatesStr) {
-      try {
-        const customTemplates = JSON.parse(customTemplatesStr);
-        setTemplates((prev) => {
-          const ids = new Set(prev.map((t) => t.id));
-          const newCustoms = customTemplates.filter(
-            (t: TemplateInfo) => !ids.has(t.id),
-          );
-          return [...prev, ...newCustoms];
-        });
-      } catch (e) {
-        console.error("Failed to parse custom templates:", e);
-      }
-    }
   }, []);
 
   // Sync participants to API whenever they change
   useEffect(() => {
+    if (!isInitialized) return;
     // We use a timeout to debounce updates to avoid flooding API on rapid changes
     const timeoutId = setTimeout(() => {
-      if (participants.length > 0 || participants.length === 0) {
-        // Logic: if we have 0, we might want to clear backend too?
-        // The API setAll does bulk replace, so sending [] clears it.
-        // But we only want to save if initialized.
-        // Simplified: just save.
-        api.participants.setAll(participants).catch(e => console.error("Auto-save failed", e));
-      }
+      api.participants.setAll(participants).catch(e => console.error("Auto-save failed", e));
     }, 1000);
     return () => clearTimeout(timeoutId);
-  }, [participants]);
+  }, [participants, isInitialized]);
 
   const handleQuickAction = (action: string) => {
     console.log("Quick action triggered:", action);
@@ -285,9 +283,9 @@ function App() {
     setParticipants(updated);
   };
 
-  const handleTemplateUpload = (newTemplate: TemplateInfo) => {
-    // Save to localStorage
-    const stored = localStorage.getItem("auto-cert-custom-templates");
+  const handleTemplateUpload = async (newTemplate: TemplateInfo) => {
+    // Save to API
+    const stored = await api.settings.get("auto-cert-custom-templates");
     let custom: TemplateInfo[] = [];
     if (stored) {
       try {
@@ -297,7 +295,11 @@ function App() {
       }
     }
     custom.push(newTemplate);
-    localStorage.setItem("auto-cert-custom-templates", JSON.stringify(custom));
+    try {
+      await api.settings.set("auto-cert-custom-templates", JSON.stringify(custom));
+    } catch (e) {
+      console.error("Failed to update API storage", e);
+    }
 
     // Update state
     setTemplates((prev) => [newTemplate, ...prev]); // Add to top
@@ -306,19 +308,16 @@ function App() {
     handleTemplateSelect(newTemplate);
   };
 
-  const handleTemplateDelete = (templateId: string) => {
-    // Remove from localStorage
-    const stored = localStorage.getItem("auto-cert-custom-templates");
+  const handleTemplateDelete = async (templateId: string) => {
+    // Remove from API
+    const stored = await api.settings.get("auto-cert-custom-templates");
     if (stored) {
       try {
         const custom: TemplateInfo[] = JSON.parse(stored);
         const updated = custom.filter((t) => t.id !== templateId);
-        localStorage.setItem(
-          "auto-cert-custom-templates",
-          JSON.stringify(updated),
-        );
+        await api.settings.set("auto-cert-custom-templates", JSON.stringify(updated));
       } catch (e) {
-        console.error("Failed to update storage", e);
+        console.error("Failed to update API metadata", e);
       }
     }
 
@@ -328,7 +327,7 @@ function App() {
     // If selected, deselect
     if (selectedTemplate?.id === templateId) {
       setSelectedTemplate(null);
-      localStorage.removeItem("auto-cert-selected-template");
+      await api.settings.set("auto-cert-selected-template", "");
     }
   };
 
@@ -369,7 +368,7 @@ function App() {
       setSelectedTemplate(data.selectedTemplate);
       await api.settings.set("auto-cert-selected-template", JSON.stringify(data.selectedTemplate));
     }
-    await api.settings.set("auto-cert-tutorial-completed", "true");
+    localStorage.setItem("auto-cert-tutorial-completed", "true");
     setShowTutorial(false);
   };
 
@@ -398,22 +397,18 @@ function App() {
   >([]);
 
   useEffect(() => {
-    const savedProjects = localStorage.getItem("auto-cert-recent-projects");
-    if (savedProjects) {
+    const initProjects = async () => {
       try {
-        setRecentProjects(JSON.parse(savedProjects));
+        const savedProjects = await api.settings.get("auto-cert-recent-projects");
+        if (savedProjects) {
+          setRecentProjects(JSON.parse(savedProjects));
+        }
       } catch (e) {
         console.error("Failed to parse recent projects:", e);
       }
-    }
+    };
+    initProjects();
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "auto-cert-recent-projects",
-      JSON.stringify(recentProjects),
-    );
-  }, [recentProjects]);
 
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
@@ -441,7 +436,9 @@ function App() {
 
     setRecentProjects((prev) => {
       const filtered = prev.filter((p) => p.id !== projectId);
-      return [newProject, ...filtered].slice(0, 5); // Keep last 5
+      const updated = [newProject, ...filtered].slice(0, 5); // Keep last 5
+      api.settings.set("auto-cert-recent-projects", JSON.stringify(updated)).catch(e => console.error("Could not save to API", e));
+      return updated;
     });
 
     setHasUnsavedChanges(false);
@@ -460,6 +457,7 @@ function App() {
       () => {
         setRecentProjects((prev) => {
           const updated = prev.filter((p) => p.id !== projectId);
+          api.settings.set("auto-cert-recent-projects", JSON.stringify(updated)).catch(e => console.error("Could not save to API", e));
           return updated;
         });
         showSnackbar("Projekt został usunięty.", "success");

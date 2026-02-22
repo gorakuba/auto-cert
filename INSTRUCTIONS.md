@@ -144,12 +144,12 @@ yarn dev
 yarn web-app:e2e
 
 # Run Frontend Unit Tests
-yarn web:test
+yarn web-app:test
 
 # Run Backend Tests
 dotnet test apps/backend/AutoCert.Tests
 
 # Build Producton
-yarn web:build
+yarn web-app:build
 dotnet build apps/backend/AutoCert.Backend
 ```

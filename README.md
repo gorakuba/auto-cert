@@ -77,7 +77,7 @@ yarn dev
 3. **Generuj certyfikaty** → Podgląd + edycja tekstu
 4. **Eksportuj ZIP** → Wszystkie certyfikaty w archiwum
 
----4. **Czytaj wskazówki**
+**Czytaj wskazówki**
 
 - Skróty klawiszowe (Ctrl+D)
 - Porady dotyczące szablonów
@@ -85,35 +85,48 @@ yarn dev
 
 ---
 
-## 📸 Wygląd Dashboard
+## 🏗️ Architektura
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  Dashboard Certyfikatów 📊                    Dzisiaj 🎓    │
-│  Witaj! Zarządzaj swoimi certyfikatami w jednym miejscu     │
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐  ┌───────┐│
-│  │👥 Uczestn. │  │📈 Średni   │  │🎨 Szablony │  │📁 Pro.││
-│  │    24      │  │   Wynik    │  │     12     │  │   5   ││
-│  │ 18 z email │  │    87.5    │  │  3 własne  │  │       ││
-│  └────────────┘  └────────────┘  └────────────┘  └───────┘│
-│                                                               │
-│  Szybkie Akcje                                                │
-│  ┌──────────────────────┐  ┌──────────────────────┐        │
-│  │📥 Importuj Uczestń.  │  │🎨 Wybierz Szablon    │        │
-│  │Wczytaj dane z CSV    │  │Przeglądaj galerię    │        │
-│  └──────────────────────┘  └──────────────────────┘        │
-│  ┌──────────────────────┐  ┌──────────────────────┐        │
-│  │✨ Generuj Certyfikaty│  │✏️ Zarządzaj Uczestń.  │        │
-│  └──────────────────────┘  └──────────────────────┘        │
-│                                                               │
-│  📋 Ostatnia Aktywność       💡 Wskazówki                   │
-│  • Zaimportowano 24 uczest.  • Użyj Ctrl+D dla szybkiego   │
-│  • Wygenerowano 20 certyfik. • Dodaj własne szablony        │
-│  • Dostępnych 12 szablonów   • Import+ wykrywa kolumny      │
-│                                                               │
-└─────────────────────────────────────────────────────────────┘
+Aplikacja działa w modelu Monorepo Klient-Serwer:
+
+```mermaid
+graph TB
+    subgraph "Frontend (React SPA)<br/>apps/web-app"
+        direction TB
+        A["💻 UI Components"] 
+        B["⚙️ Application Logic"]
+        C["📡 API Client"]
+        D["🎨 Canvas Engine"]
+        E["📄 Document Gen"]
+    end
+
+    subgraph "Backend (.NET 9)<br/>apps/backend"
+        direction TB
+        F["🌐 Minimal API"]
+        G["🛡️ Business Logic"]
+        H["🔄 EF Core (ORM)"]
+    end
+
+    subgraph "Data Storage"
+        I[("🗄️ SQLite Database")]
+    end
+
+    A --> B
+    B --> C
+    B --> D
+    D --> E
+    C -- "HTTP/JSON" --> F
+    F --> G
+    G --> H
+    H --> I
+
+    style A fill:#e1f5fe,stroke:#01579b,color:#000
+    style B fill:#e1f5fe,stroke:#01579b,color:#000
+    style C fill:#e1f5fe,stroke:#01579b,color:#000
+    style F fill:#e8f5e9,stroke:#2e7d32,color:#000
+    style G fill:#e8f5e9,stroke:#2e7d32,color:#000
+    style H fill:#e8f5e9,stroke:#2e7d32,color:#000
+    style I fill:#f3e5f5,stroke:#7b1fa2,color:#000
 ```
 
 ---
@@ -147,7 +160,7 @@ yarn
 yarn dev
 
 # Budowanie wersji produkcyjnej
-yarn web:build
+yarn web-app:build
 dotnet build apps/backend/AutoCert.Backend
 
 # Uruchomienie przez Docker (Produkcja)
@@ -178,7 +191,7 @@ auto-cert/
 │   │   ├── src/
 │   │   ├── e2e/             # Testy E2E (Playwright)
 │   │   └── package.json
-│   └── api/                  # Backend (.NET)
+│   └── backend/                  # Backend (.NET)
 │       ├── AutoCert.Backend/
 │       ├── AutoCert.Tests/
 │       └── AutoCert.Backend.sln

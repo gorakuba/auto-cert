@@ -7,22 +7,22 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# API
-apps/api/AutoCert.Api/bin/
-apps/api/AutoCert.Api/obj/
-apps/api/AutoCert.Tests/bin/
-apps/api/AutoCert.Tests/obj/
+# Backend
+apps/backend/AutoCert.Backend/bin/
+apps/backend/AutoCert.Backend/obj/
+apps/backend/AutoCert.Tests/bin/
+apps/backend/AutoCert.Tests/obj/
 auto-cert.db
 auto-cert.db-shm
 auto-cert.db-wal
 
-# Web
-apps/web/dist/
-apps/web/dist-ssr/
-apps/web/e2e/test-results/
-apps/web/e2e/playwright-report/
-apps/web/playwright-report/
-apps/web/test-results/
+# Web-App
+apps/web-app/dist/
+apps/web-app/dist-ssr/
+apps/web-app/e2e/test-results/
+apps/web-app/e2e/playwright-report/
+apps/web-app/playwright-report/
+apps/web-app/test-results/
 
 node_modules
 dist

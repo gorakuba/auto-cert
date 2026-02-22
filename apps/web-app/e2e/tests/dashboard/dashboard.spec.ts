@@ -5,14 +5,16 @@ import { snapshot } from "../../helpers/screenshot";
 const SCREENSHOT_DIR = path.join("tests", "e2e", "dashboard", "screenshots");
 
 test.describe("Dashboard", () => {
-  test.beforeEach(async ({ page, request }) => {
-    // 1. Skip tutorial via API
-    await request.put("/api/settings/auto-cert-tutorial-completed", {
-      data: { value: "true" }
+  test.beforeEach(async ({ page, context, request }) => {
+    // 1. Skip tutorial via localStorage
+    await context.addInitScript(() => {
+      window.localStorage.setItem("auto-cert-tutorial-completed", "true");
     });
 
     // 2. Clear and seed participants via API
     await request.delete("/api/participants");
+    await request.put("/api/settings/auto-cert-recent-projects", { data: { value: "" } });
+    await request.put("/api/settings/auto-cert-custom-templates", { data: { value: "[]" } });
     await request.post("/api/participants/bulk", {
       data: [
         { id: "1", name: "Jan Kowalski", email: "jan@example.com", status: "completed" },
@@ -41,7 +43,8 @@ test.describe("Dashboard", () => {
     await expect(page.getByRole("button", { name: "+ Nowy Projekt" })).toBeVisible();
 
     await expect(page.getByText("Ostatnia Aktywność")).toBeVisible();
-    await expect(page.getByText("Witaj w nowym dashboardzie!")).toBeVisible();
+    await expect(page.getByText("Zaimportowano 3", { exact: false })).toBeVisible();
+    await expect(page.getByText("Wygenerowano 125", { exact: false })).toBeVisible();
 
     await page.evaluate(() => window.scrollTo(0, 0));
     await snapshot(page, `${SCREENSHOT_DIR}/dashboard-welcome.png`);
