@@ -1,4 +1,4 @@
-# Auto-Cert - Generator Certyfikatów 🎓
+# AutoCert - Generator Certyfikatów 🎓
 
 Nowoczesna aplikacja do generowania certyfikatów z podglądem na żywo, eksportem do ZIP i zarządzaniem uczestnikami.
 
