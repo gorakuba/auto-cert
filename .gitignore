@@ -7,10 +7,25 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Backend
+apps/backend/AutoCert.Backend/bin/
+apps/backend/AutoCert.Backend/obj/
+apps/backend/AutoCert.Tests/bin/
+apps/backend/AutoCert.Tests/obj/
+auto-cert.db
+auto-cert.db-shm
+auto-cert.db-wal
+
+# Web-App
+apps/web-app/dist/
+apps/web-app/dist-ssr/
+apps/web-app/e2e/test-results/
+apps/web-app/e2e/playwright-report/
+apps/web-app/playwright-report/
+apps/web-app/test-results/
+
 node_modules
 dist
-dist-ssr
-*.local
 
 # Editor directories and files
 .vscode/*
@@ -22,3 +37,18 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Testing
+coverage
+.nyc_output
+
+# Environment environments
+.env
+.env.test
+.env.production
+
+# TypeScript
+*.tsbuildinfo
+
+# OS
+Thumbs.db

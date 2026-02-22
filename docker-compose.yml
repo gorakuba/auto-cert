@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    container_name: auto-cert-app
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data
+    environment:
+      - DB_PATH=/data/auto-cert.db
+    restart: unless-stopped

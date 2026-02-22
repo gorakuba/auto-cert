@@ -1,0 +1,22 @@
+<svg width="200" height="60" viewBox="0 0 300 60" xmlns="http://www.w3.org/2000/svg">
+  <g id="icon" transform="translate(10, 10)">
+    <!-- Document body -->
+    <path d="M10 5H40V55H10V5Z" fill="#3730a3" />
+    <!-- Document fold/shadow -->
+    <path d="M40 5L50 15V55H40V5Z" fill="#312e81" />
+    <!-- Lines on document -->
+    <rect x="15" y="15" width="15" height="2" fill="white" />
+    <rect x="15" y="25" width="20" height="2" fill="white" />
+    <rect x="15" y="35" width="10" height="2" fill="white" />
+    <!-- Checkmark -->
+    <path d="M25 45L35 55L60 30" stroke="#818cf8" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <text x="80" y="45" font-family="Arial, sans-serif" font-weight="bold" font-size="34">
+    <tspan fill="#3730a3">Auto</tspan><tspan fill="#4f46e5">Cert</tspan>
+  </text>
+
+  <text x="82" y="62" font-family="Arial, sans-serif" font-size="10" fill="#6b7280" letter-spacing="1">
+    AUTOMATIC CERTIFICATION SYSTEM
+  </text>
+</svg>

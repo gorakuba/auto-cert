@@ -1,0 +1,8 @@
+C:\Users\Media\Desktop\auto-cert\AutoCert.Api\obj\Release\net9.0\AutoCert.Api.csproj.AssemblyReference.cache
+C:\Users\Media\Desktop\auto-cert\AutoCert.Api\obj\Release\net9.0\AutoCert.Api.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Media\Desktop\auto-cert\AutoCert.Api\obj\Release\net9.0\AutoCert.Api.AssemblyInfoInputs.cache
+C:\Users\Media\Desktop\auto-cert\AutoCert.Api\obj\Release\net9.0\AutoCert.Api.AssemblyInfo.cs
+C:\Users\Media\Desktop\auto-cert\AutoCert.Api\obj\Release\net9.0\AutoCert.Api.csproj.CoreCompileInputs.cache
+C:\Users\Media\Desktop\auto-cert\AutoCert.Api\obj\Release\net9.0\AutoCert.Api.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Media\Desktop\auto-cert\AutoCert.Api\obj\Release\net9.0\AutoCert.Api.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Media\Desktop\auto-cert\AutoCert.Api\obj\Release\net9.0\AutoCert.Api.sourcelink.json
