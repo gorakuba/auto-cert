@@ -17,42 +17,23 @@ import { TemplatesPage } from "./pages/TemplatesPage";
 import type { Participant, TemplateInfo } from "./types";
 import { api } from "./services/api";
 
-function App() {
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { ProtectedRoute } from "./router/ProtectedRoute";
+import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
+import { VerifyEmailPendingPage } from "./pages/VerifyEmailPendingPage";
+import { VerifyEmailPage } from "./pages/VerifyEmailPage";
+
+function MainApp() {
   const [showTutorial, setShowTutorial] = useState(false);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [templates, setTemplates] = useState<TemplateInfo[]>([
-    {
-      id: "t1",
-      name: "Szablon Klasyczny",
-      thumbnail: "/templates/template1.svg",
-      path: "/templates/template1.svg",
-      description: "Elegancki klasyczny certyfikat",
-      category: "education",
-      isCustom: false,
-    },
-    {
-      id: "t2",
-      name: "Szablon Nowoczesny",
-      thumbnail: "/templates/template2.svg",
-      path: "/templates/template2.svg",
-      description: "Nowoczesny design z geometrycznymi elementami",
-      category: "business",
-      isCustom: false,
-    },
-    {
-      id: "t3",
-      name: "Szablon Minimalistyczny",
-      thumbnail: "/templates/template3.svg",
-      path: "/templates/template3.svg",
-      description: "Prosty i elegancki minimalizm",
-      category: "other",
-      isCustom: false,
-    },
-  ]);
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateInfo | null>(
-    templates[0],
-  );
+
+  const [templates, setTemplates] = useState<TemplateInfo[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateInfo | null>(null);
   const [generatedCount, setGeneratedCount] = useState(0);
 
   // Modals
@@ -142,31 +123,34 @@ function App() {
         const savedTemplateStr = await api.settings.get(
           "auto-cert-selected-template",
         );
-        if (savedTemplateStr) {
+
+        // Load all templates from API (includes defaults + custom)
+        const allTemplatesStr = await api.settings.get(
+          "auto-cert-custom-templates",
+        );
+        let loadedTemplates: TemplateInfo[] = [];
+        if (allTemplatesStr) {
           try {
-            setSelectedTemplate(JSON.parse(savedTemplateStr));
+            loadedTemplates = JSON.parse(allTemplatesStr);
           } catch (e) {
-            console.error(e);
+            console.error("Failed to parse templates:", e);
           }
         }
 
-        // Load custom templates from API
-        const customTemplatesStr = await api.settings.get(
-          "auto-cert-custom-templates",
-        );
-        if (customTemplatesStr) {
+        setTemplates(loadedTemplates);
+
+        if (savedTemplateStr) {
           try {
-            const customTemplates = JSON.parse(customTemplatesStr);
-            setTemplates((prev) => {
-              const ids = new Set(prev.map((t) => t.id));
-              const newCustoms = customTemplates.filter(
-                (t: TemplateInfo) => !ids.has(t.id),
-              );
-              return [...prev, ...newCustoms];
-            });
+            const saved = JSON.parse(savedTemplateStr) as TemplateInfo;
+            // Refresh from current loaded list to keep data in sync
+            const match = loadedTemplates.find((t) => t.id === saved.id);
+            setSelectedTemplate(match ?? saved);
           } catch (e) {
-            console.error("Failed to parse custom templates:", e);
+            console.error(e);
           }
+        } else if (loadedTemplates.length > 0) {
+          // Auto-select first template on first run
+          setSelectedTemplate(loadedTemplates[0]);
         }
       } catch (e) {
         console.error("Failed to initialize data:", e);
@@ -284,45 +268,28 @@ function App() {
   };
 
   const handleTemplateUpload = async (newTemplate: TemplateInfo) => {
-    // Save to API
-    const stored = await api.settings.get("auto-cert-custom-templates");
-    let custom: TemplateInfo[] = [];
-    if (stored) {
-      try {
-        custom = JSON.parse(stored);
-      } catch (e) {
-        console.error("Failed to parse", e);
-      }
-    }
-    custom.push(newTemplate);
-    try {
-      await api.settings.set("auto-cert-custom-templates", JSON.stringify(custom));
-    } catch (e) {
-      console.error("Failed to update API storage", e);
-    }
-
-    // Update state
-    setTemplates((prev) => [newTemplate, ...prev]); // Add to top
+    // Add to top of current list and persist full list to API
+    setTemplates((prev) => {
+      const updated = [newTemplate, ...prev];
+      api.settings
+        .set("auto-cert-custom-templates", JSON.stringify(updated))
+        .catch((e) => console.error("Failed to update API storage", e));
+      return updated;
+    });
 
     // Auto-select
     handleTemplateSelect(newTemplate);
   };
 
   const handleTemplateDelete = async (templateId: string) => {
-    // Remove from API
-    const stored = await api.settings.get("auto-cert-custom-templates");
-    if (stored) {
-      try {
-        const custom: TemplateInfo[] = JSON.parse(stored);
-        const updated = custom.filter((t) => t.id !== templateId);
-        await api.settings.set("auto-cert-custom-templates", JSON.stringify(updated));
-      } catch (e) {
-        console.error("Failed to update API metadata", e);
-      }
-    }
-
-    // Update state
-    setTemplates((prev) => prev.filter((t) => t.id !== templateId));
+    // Remove from list and persist updated list to API
+    setTemplates((prev) => {
+      const updated = prev.filter((t) => t.id !== templateId);
+      api.settings
+        .set("auto-cert-custom-templates", JSON.stringify(updated))
+        .catch((e) => console.error("Failed to update API metadata", e));
+      return updated;
+    });
 
     // If selected, deselect
     if (selectedTemplate?.id === templateId) {
@@ -631,6 +598,29 @@ function App() {
         onClose={closeSnackbar}
       />
     </>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public Auth Routes */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/verify-email-pending" element={<VerifyEmailPendingPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
+
+          {/* Protected Main App Route */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/*" element={<MainApp />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

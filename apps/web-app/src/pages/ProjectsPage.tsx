@@ -16,12 +16,24 @@ export const ProjectsPage = ({
   onNewProject,
 }: ProjectsPageProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"newest" | "oldest" | "most">("newest");
+
+  const SORT_OPTIONS: { key: typeof sortBy; label: string }[] = [
+    { key: "newest", label: "Najnowsze" },
+    { key: "oldest", label: "Najstarsze" },
+    { key: "most", label: "Najwięcej uczestników" },
+  ];
 
   const filteredProjects = useMemo(() => {
-    return projects.filter((project) =>
+    const filtered = projects.filter((project) =>
       project.templateName.toLowerCase().includes(searchQuery.toLowerCase()),
     );
-  }, [projects, searchQuery]);
+    return [...filtered].sort((a, b) => {
+      if (sortBy === "newest") return b.lastEdited - a.lastEdited;
+      if (sortBy === "oldest") return a.lastEdited - b.lastEdited;
+      return b.participantsCount - a.participantsCount;
+    });
+  }, [projects, searchQuery, sortBy]);
 
   return (
     <div className="w-full h-full flex flex-col animate-in fade-in duration-300">
@@ -58,7 +70,29 @@ export const ProjectsPage = ({
         value={searchQuery}
         onChange={setSearchQuery}
         placeholder="Szukaj projektu..."
+        disabled={projects.length === 0}
       />
+
+      {/* Sort chips */}
+      {projects.length > 0 && (
+        <div className="flex items-center gap-2 mb-5 -mt-2 flex-wrap">
+          {SORT_OPTIONS.map((s) => (
+            <button
+              key={s.key}
+              onClick={() => setSortBy(s.key)}
+              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all border ${sortBy === s.key
+                  ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                  : "bg-white text-gray-500 border-gray-200 hover:border-indigo-300 hover:text-indigo-600"
+                }`}
+            >
+              {s.label}
+            </button>
+          ))}
+          <span className="text-xs text-gray-400 ml-auto">
+            {filteredProjects.length} z {projects.length}
+          </span>
+        </div>
+      )}
 
       {/* Projects Grid */}
       {filteredProjects.length > 0 ? (

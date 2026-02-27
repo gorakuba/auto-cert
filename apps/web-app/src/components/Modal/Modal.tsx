@@ -178,12 +178,12 @@ export function Modal({
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto flex-1">
-          <div className="flex flex-col gap-5">
+        <div className="px-6 py-5 overflow-y-auto flex-1">
+          <div className="flex flex-col gap-4">
             {/* Show icon only if it's an alert-style message without complex children, or if explicitly desired. 
                 For cleanliness, let's show Icon + Message at top if message exists. */}
             {(message && type !== "info") || (message && type === "info") ? (
-              <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-center gap-4">
                 {type !== "info" && (
                   <div
                     className={`p-3 rounded-full h-fit w-fit flex-shrink-0 ${theme.iconBg} ${theme.iconColor}`}

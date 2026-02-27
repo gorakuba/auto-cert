@@ -1,6 +1,10 @@
+using System.Text;
 using AutoCert.Backend.Data;
 using AutoCert.Backend.Endpoints;
+using AutoCert.Backend.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +14,27 @@ var dbPath = builder.Configuration["DB_PATH"]
 
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlite($"Data Source={dbPath}"));
+
+builder.Services.AddSingleton<EmailService>();
+
+// --- Authentication (JWT) ---
+var jwtKey = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("Missing Jwt:Key in config");
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+builder.Services.AddAuthorization();
 
 // --- Swagger/OpenAPI ---
 builder.Services.AddEndpointsApiExplorer();
@@ -38,11 +63,14 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureDeleted(); // Warning: this destroys all data on startup! Good for dev reset.
     db.Database.EnsureCreated();
 }
 
 // --- Middleware ---
 app.UseCors();
+app.UseAuthentication();
+app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
@@ -63,6 +91,7 @@ if (app.Environment.IsProduction())
 }
 
 // --- API Endpoints ---
+app.MapAuthEndpoints();
 app.MapParticipantsEndpoints();
 app.MapSettingsEndpoints();
 

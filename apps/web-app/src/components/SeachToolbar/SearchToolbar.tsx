@@ -3,6 +3,7 @@ interface SearchToolbarProps {
   onChange: (value: string) => void;
   placeholder?: string;
   children?: React.ReactNode;
+  disabled?: boolean;
 }
 
 export const SearchToolbar = ({
@@ -10,15 +11,17 @@ export const SearchToolbar = ({
   onChange,
   placeholder = "Szukaj...",
   children,
+  disabled = false,
 }: SearchToolbarProps) => {
   return (
-    <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center animate-in fade-in slide-in-from-bottom-2 duration-500">
-      <div className="flex-1 relative w-full">
+    <div className="flex flex-col md:flex-row gap-3 items-center mb-6">
+      <div className="flex-1 relative w-full group">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"
+          className={`w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${disabled ? "text-gray-200" : "text-gray-400 group-focus-within:text-indigo-500"
+            }`}
         >
           <path
             fillRule="evenodd"
@@ -31,7 +34,11 @@ export const SearchToolbar = ({
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 bg-gray-50 border-transparent focus:border-indigo-500 focus:bg-white rounded-lg focus:ring-2 focus:ring-indigo-500/20 text-gray-900 placeholder-gray-400 transition-all"
+          disabled={disabled}
+          className={`w-full pl-10 pr-5 py-2.5 text-sm rounded-xl border transition-all outline-none ${disabled
+            ? "bg-gray-50 border-gray-100 text-gray-300 placeholder-gray-300 cursor-not-allowed"
+            : "bg-white border-gray-200 text-gray-900 placeholder-gray-400 hover:border-gray-300 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/10 shadow-sm"
+            }`}
         />
       </div>
       {children && (

@@ -1,5 +1,6 @@
+import "@testing-library/jest-dom";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { renderWithProviders, screen, waitFor } from "../test/utils/test-utils";
+import { renderWithProviders, screen, waitFor } from "../../utils/test-utils";
 import { Snackbar } from "./Snackbar";
 
 describe("Snackbar Component", () => {

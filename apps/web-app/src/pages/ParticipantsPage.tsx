@@ -24,6 +24,7 @@ export const ParticipantsPage = ({
   onShowSnackbar,
 }: ParticipantsPageProps) => {
   const [search, setSearch] = useState("");
+  const [attrFilter, setAttrFilter] = useState<"all" | "email" | "company">("all");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
@@ -36,12 +37,23 @@ export const ParticipantsPage = ({
   });
   const [deleteAllModal, setDeleteAllModal] = useState(false);
 
-  const filteredParticipants = participants.filter(
-    (p) =>
+  const filteredParticipants = participants.filter((p) => {
+    const matchesSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.email?.toLowerCase().includes(search.toLowerCase()) ||
-      p.company?.toLowerCase().includes(search.toLowerCase()),
-  );
+      p.company?.toLowerCase().includes(search.toLowerCase());
+    const matchesAttr =
+      attrFilter === "all" ||
+      (attrFilter === "email" && !!p.email) ||
+      (attrFilter === "company" && !!p.company);
+    return matchesSearch && matchesAttr;
+  });
+
+  const ATTR_FILTERS: { key: typeof attrFilter; label: string }[] = [
+    { key: "all", label: "Wszyscy" },
+    { key: "email", label: "Z emailem" },
+    { key: "company", label: "Z firmą" },
+  ];
 
   const handleEdit = (participant: Participant) => {
     setEditingId(participant.id);
@@ -180,6 +192,7 @@ export const ParticipantsPage = ({
         value={search}
         onChange={setSearch}
         placeholder="Szukaj uczestnika..."
+        disabled={participants.length === 0}
       >
         {participants.length > 0 && (
           <button
@@ -198,6 +211,27 @@ export const ParticipantsPage = ({
           </button>
         )}
       </SearchToolbar>
+
+      {/* Filter chips */}
+      {participants.length > 0 && (
+        <div className="flex items-center gap-2 mb-5 -mt-2 flex-wrap">
+          {ATTR_FILTERS.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setAttrFilter(f.key)}
+              className={`px-3 py-1 rounded-full text-xs font-semibold transition-all border ${attrFilter === f.key
+                  ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                  : "bg-white text-gray-500 border-gray-200 hover:border-indigo-300 hover:text-indigo-600"
+                }`}
+            >
+              {f.label}
+            </button>
+          ))}
+          <span className="text-xs text-gray-400 ml-auto">
+            {filteredParticipants.length} z {participants.length}
+          </span>
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         {/* Content */}

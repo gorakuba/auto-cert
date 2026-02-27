@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface SidebarItemProps {
   icon: ReactNode;
@@ -54,6 +56,19 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ activeTab, onTabChange, counts }: SidebarProps) => {
+  const { user, logoutState } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (e) {
+      console.error("Logout API failed", e);
+    }
+    logoutState();
+    navigate("/login");
+  };
+
   return (
     <div className="w-72 bg-white h-screen fixed left-0 top-0 border-r border-gray-100 p-6 flex flex-col z-20 hidden lg:flex">
       {/* Logo */}
@@ -185,6 +200,35 @@ export const Sidebar = ({ activeTab, onTabChange, counts }: SidebarProps) => {
           }
         />
       </div>
+
+      {/* User Profile & Logout */}
+      {user && (
+        <div className="mt-auto pt-6 border-t border-gray-100/50">
+          <div className="flex items-center gap-3 mb-4 px-2">
+            <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm shadow-inner shadow-indigo-200/50">
+              {user.email.substring(0, 2).toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                Zalogowany jako
+              </p>
+              <p className="text-xs text-gray-500 truncate" title={user.email}>
+                {user.email}
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all font-medium text-sm group"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 group-hover:scale-110 transition-transform">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+            </svg>
+            Wyloguj
+          </button>
+        </div>
+      )}
     </div>
   );
 };

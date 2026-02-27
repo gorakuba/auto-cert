@@ -2,6 +2,7 @@ namespace AutoCert.Backend.Models;
 
 public class Setting
 {
+    public string UserId { get; set; } = string.Empty;
     public string Key { get; set; } = string.Empty;
     public string Value { get; set; } = string.Empty;
 }

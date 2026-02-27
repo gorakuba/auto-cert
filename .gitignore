@@ -12,9 +12,10 @@ apps/backend/AutoCert.Backend/bin/
 apps/backend/AutoCert.Backend/obj/
 apps/backend/AutoCert.Tests/bin/
 apps/backend/AutoCert.Tests/obj/
-auto-cert.db
-auto-cert.db-shm
-auto-cert.db-wal
+apps/backend/AutoCert.Tests/TestResults/
+*.db
+*.db-shm
+*.db-wal
 
 # Web-App
 apps/web-app/dist/
@@ -23,6 +24,8 @@ apps/web-app/e2e/test-results/
 apps/web-app/e2e/playwright-report/
 apps/web-app/playwright-report/
 apps/web-app/test-results/
+apps/web-app/blob-report/
+apps/web-app/.vite/
 
 node_modules
 dist
@@ -41,11 +44,17 @@ dist
 # Testing
 coverage
 .nyc_output
+TestResults/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
 
 # Environment environments
 .env
 .env.test
 .env.production
+.env*.local
 
 # TypeScript
 *.tsbuildinfo
