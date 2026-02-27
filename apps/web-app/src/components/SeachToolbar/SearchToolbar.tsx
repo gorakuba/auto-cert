@@ -1,8 +1,16 @@
+interface FilterOption {
+  label: string;
+  value: string;
+}
+
 interface SearchToolbarProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   children?: React.ReactNode;
+  filters?: FilterOption[];
+  activeFilter?: string;
+  onFilterChange?: (value: string) => void;
 }
 
 export const SearchToolbar = ({
@@ -10,15 +18,18 @@ export const SearchToolbar = ({
   onChange,
   placeholder = "Szukaj...",
   children,
+  filters,
+  activeFilter,
+  onFilterChange,
 }: SearchToolbarProps) => {
   return (
-    <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center animate-in fade-in slide-in-from-bottom-2 duration-500">
-      <div className="flex-1 relative w-full">
+    <div className="mb-6 flex flex-col md:flex-row gap-3 items-center animate-in fade-in slide-in-from-bottom-2 duration-500 w-full">
+      <div className="flex-1 relative w-full h-11">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
           fill="currentColor"
-          className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2"
+          className="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 z-10"
         >
           <path
             fillRule="evenodd"
@@ -31,11 +42,33 @@ export const SearchToolbar = ({
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 bg-gray-50 border-transparent focus:border-indigo-500 focus:bg-white rounded-lg focus:ring-2 focus:ring-indigo-500/20 text-gray-900 placeholder-gray-400 transition-all"
+          className="w-full h-full pl-11 pr-4 bg-white border border-gray-200 focus:border-indigo-500 rounded-xl focus:ring-2 focus:ring-indigo-500/20 text-gray-900 placeholder-gray-400 transition-all shadow-sm"
         />
       </div>
+
+      {filters && filters.length > 0 && onFilterChange && (
+        <div className="w-full lg:w-auto h-auto flex gap-2 overflow-x-auto pb-1 md:pb-0 scrollbar-hide shrink-0 items-center">
+          {filters.map((filter) => {
+            const isActive = activeFilter === filter.value;
+            return (
+              <button
+                key={filter.value}
+                onClick={() => onFilterChange(filter.value)}
+                className={`px-4 h-10 rounded-full text-sm font-medium transition-all shrink-0 border ${
+                  isActive
+                    ? "bg-indigo-600 border-indigo-600 text-white shadow-sm shadow-indigo-200"
+                    : "bg-white border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900"
+                }`}
+              >
+                {filter.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       {children && (
-        <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+        <div className="flex items-center gap-2 w-full md:w-auto shrink-0 md:justify-end">
           {children}
         </div>
       )}

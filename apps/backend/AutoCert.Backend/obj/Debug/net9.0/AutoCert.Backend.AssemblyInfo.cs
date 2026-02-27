@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AutoCert.Backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8382db58962846cbf2918fb0ea5f05ec02d3f1a8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7c0ffac2489320fe1d08e2052108d4aed975aeda")]
 [assembly: System.Reflection.AssemblyProductAttribute("AutoCert.Backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AutoCert.Backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

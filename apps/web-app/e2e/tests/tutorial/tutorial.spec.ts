@@ -8,8 +8,12 @@ test.describe("Tutorial Flow", () => {
   test.beforeEach(async ({ page, context, request }) => {
     // Reset state via API
     await request.delete("/api/participants");
-    await request.put("/api/settings/auto-cert-recent-projects", { data: { value: "" } });
-    await request.put("/api/settings/auto-cert-custom-templates", { data: { value: "[]" } });
+    await request.put("/api/settings/auto-cert-recent-projects", {
+      data: { value: "" },
+    });
+    await request.put("/api/settings/auto-cert-custom-templates", {
+      data: { value: "[]" },
+    });
     // Clear tutorial completed from localStorage to force tutorial to show
     await context.addInitScript(() => {
       window.localStorage.removeItem("auto-cert-tutorial-completed");

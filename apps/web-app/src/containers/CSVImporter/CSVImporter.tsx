@@ -17,10 +17,7 @@ interface CSVImporterProps {
   onClose: () => void;
 }
 
-export const CSVImporter = ({
-  onImport,
-  onClose,
-}: CSVImporterProps) => {
+export const CSVImporter = ({ onImport, onClose }: CSVImporterProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState<string[][]>([]);
   const [fileName, setFileName] = useState("");

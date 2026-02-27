@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
-import {
-  Layout,
-  Modal,
-  Snackbar,
-} from "./components";
+import { Layout, Modal, Snackbar } from "./components";
 import {
   CertificateGenerator,
   Dashboard,
   Tutorial,
   ZipExporter,
-  CSVImporter
+  CSVImporter,
 } from "./containers";
 import { ParticipantsPage } from "./pages/ParticipantsPage";
 import { ProjectsPage } from "./pages/ProjectsPage";
@@ -182,7 +178,9 @@ function App() {
     if (!isInitialized) return;
     // We use a timeout to debounce updates to avoid flooding API on rapid changes
     const timeoutId = setTimeout(() => {
-      api.participants.setAll(participants).catch(e => console.error("Auto-save failed", e));
+      api.participants
+        .setAll(participants)
+        .catch((e) => console.error("Auto-save failed", e));
     }, 1000);
     return () => clearTimeout(timeoutId);
   }, [participants, isInitialized]);
@@ -296,7 +294,10 @@ function App() {
     }
     custom.push(newTemplate);
     try {
-      await api.settings.set("auto-cert-custom-templates", JSON.stringify(custom));
+      await api.settings.set(
+        "auto-cert-custom-templates",
+        JSON.stringify(custom),
+      );
     } catch (e) {
       console.error("Failed to update API storage", e);
     }
@@ -315,7 +316,10 @@ function App() {
       try {
         const custom: TemplateInfo[] = JSON.parse(stored);
         const updated = custom.filter((t) => t.id !== templateId);
-        await api.settings.set("auto-cert-custom-templates", JSON.stringify(updated));
+        await api.settings.set(
+          "auto-cert-custom-templates",
+          JSON.stringify(updated),
+        );
       } catch (e) {
         console.error("Failed to update API metadata", e);
       }
@@ -334,10 +338,13 @@ function App() {
   const handleTemplateSelect = async (template: TemplateInfo) => {
     setSelectedTemplate(template);
     // Store as JSON string in settings to keep consistency with previous logic,
-    // though backend settings are key-value strings. 
+    // though backend settings are key-value strings.
     // We are trusting the backend settings table to hold this string.
     try {
-      await api.settings.set("auto-cert-selected-template", JSON.stringify(template));
+      await api.settings.set(
+        "auto-cert-selected-template",
+        JSON.stringify(template),
+      );
     } catch (e) {
       console.error("Failed to save selected template setting", e);
     }
@@ -366,7 +373,10 @@ function App() {
     }
     if (data.selectedTemplate) {
       setSelectedTemplate(data.selectedTemplate);
-      await api.settings.set("auto-cert-selected-template", JSON.stringify(data.selectedTemplate));
+      await api.settings.set(
+        "auto-cert-selected-template",
+        JSON.stringify(data.selectedTemplate),
+      );
     }
     localStorage.setItem("auto-cert-tutorial-completed", "true");
     setShowTutorial(false);
@@ -377,7 +387,8 @@ function App() {
     setGeneratedCount(newCount);
     await api.settings.set("auto-cert-generated-count", newCount.toString());
     showSnackbar(
-      `Wygenerowano ${count} ${count === 1 ? "certyfikat" : "certyfikatów"
+      `Wygenerowano ${count} ${
+        count === 1 ? "certyfikat" : "certyfikatów"
       }! 🎉`,
       "success",
     );
@@ -399,7 +410,9 @@ function App() {
   useEffect(() => {
     const initProjects = async () => {
       try {
-        const savedProjects = await api.settings.get("auto-cert-recent-projects");
+        const savedProjects = await api.settings.get(
+          "auto-cert-recent-projects",
+        );
         if (savedProjects) {
           setRecentProjects(JSON.parse(savedProjects));
         }
@@ -437,7 +450,9 @@ function App() {
     setRecentProjects((prev) => {
       const filtered = prev.filter((p) => p.id !== projectId);
       const updated = [newProject, ...filtered].slice(0, 5); // Keep last 5
-      api.settings.set("auto-cert-recent-projects", JSON.stringify(updated)).catch(e => console.error("Could not save to API", e));
+      api.settings
+        .set("auto-cert-recent-projects", JSON.stringify(updated))
+        .catch((e) => console.error("Could not save to API", e));
       return updated;
     });
 
@@ -457,7 +472,9 @@ function App() {
       () => {
         setRecentProjects((prev) => {
           const updated = prev.filter((p) => p.id !== projectId);
-          api.settings.set("auto-cert-recent-projects", JSON.stringify(updated)).catch(e => console.error("Could not save to API", e));
+          api.settings
+            .set("auto-cert-recent-projects", JSON.stringify(updated))
+            .catch((e) => console.error("Could not save to API", e));
           return updated;
         });
         showSnackbar("Projekt został usunięty.", "success");

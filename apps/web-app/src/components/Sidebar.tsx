@@ -18,10 +18,11 @@ const SidebarItem = ({
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-        ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200"
-        : "text-gray-500 hover:bg-indigo-50 hover:text-indigo-600"
-        }`}
+      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${
+        isActive
+          ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200"
+          : "text-gray-500 hover:bg-indigo-50 hover:text-indigo-600"
+      }`}
     >
       <div
         className={`transition-transform duration-200 ${isActive ? "" : "group-hover:scale-110"}`}
@@ -31,10 +32,11 @@ const SidebarItem = ({
       <span className="font-medium">{label}</span>
       {badge ? (
         <span
-          className={`ml-auto text-xs py-0.5 px-2 rounded-full ${isActive
-            ? "bg-white/20 text-white"
-            : "bg-indigo-100 text-indigo-600"
-            }`}
+          className={`ml-auto text-xs py-0.5 px-2 rounded-full ${
+            isActive
+              ? "bg-white/20 text-white"
+              : "bg-indigo-100 text-indigo-600"
+          }`}
         >
           {badge}
         </span>

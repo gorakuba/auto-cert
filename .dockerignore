@@ -16,3 +16,9 @@ apps/web-app/dist
 *.db-wal
 tests
 coverage
+.env*
+!.env.example
+.vs
+.DS_Store
+.eslintcache
+.vite

@@ -77,10 +77,11 @@ export const Content = ({
                 setIsDragging(true);
               }}
               onDragLeave={() => setIsDragging(false)}
-              className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors ${isDragging
-                ? "border-indigo-500 bg-indigo-50"
-                : "border-gray-300 bg-gray-50"
-                }`}
+              className={`border-2 border-dashed rounded-xl p-12 text-center transition-colors ${
+                isDragging
+                  ? "border-indigo-500 bg-indigo-50"
+                  : "border-gray-300 bg-gray-50"
+              }`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

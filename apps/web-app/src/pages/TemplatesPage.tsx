@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { FaTrash } from "react-icons/fa";
 import { Modal } from "../components/Modal/Modal";
+import { SearchToolbar } from "../components/SeachToolbar/SearchToolbar";
 import type { TemplateInfo } from "../types";
 
 interface TemplatesPageProps {
@@ -18,6 +19,21 @@ export const TemplatesPage = ({
   onUpload,
   onDelete,
 }: TemplatesPageProps) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
+
+  const filteredTemplates = useMemo(() => {
+    return templates.filter((template) => {
+      const matchesSearch = template.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      if (!matchesSearch) return false;
+
+      if (activeFilter === "built_in") return !template.isCustom;
+      if (activeFilter === "custom") return template.isCustom;
+      return true;
+    });
+  }, [templates, searchQuery, activeFilter]);
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
     templateId: string | null;
@@ -72,8 +88,8 @@ export const TemplatesPage = ({
   };
 
   return (
-    <div className="w-full animate-in fade-in duration-300">
-      <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="w-full h-full flex flex-col animate-in fade-in duration-300">
+      <div className="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
             Szablony Certyfikatów
@@ -103,15 +119,29 @@ export const TemplatesPage = ({
         )}
       </div>
 
+      <SearchToolbar
+        value={searchQuery}
+        onChange={setSearchQuery}
+        placeholder="Szukaj szablonu..."
+        filters={[
+          { label: "Wszystkie szablony", value: "all" },
+          { label: "Wbudowane", value: "built_in" },
+          { label: "Własne", value: "custom" },
+        ]}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+      />
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {templates.map((template) => (
+        {filteredTemplates.map((template) => (
           <div
             key={template.id}
             onClick={() => onSelect(template)}
-            className={`group relative border rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${selectedTemplate?.id === template.id
+            className={`group relative border rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+              selectedTemplate?.id === template.id
                 ? "bg-indigo-50/30 border-indigo-600 border-2 ring-4 ring-indigo-50 shadow-lg"
                 : "bg-white border-gray-200 hover:border-indigo-300"
-              }`}
+            }`}
           >
             {/* Selected Badge */}
             {selectedTemplate?.id === template.id && (
@@ -176,6 +206,24 @@ export const TemplatesPage = ({
           </div>
         ))}
       </div>
+
+      {filteredTemplates.length === 0 && (
+        <div className="flex-1 flex flex-col items-center justify-center p-12 text-center mt-8 max-w-2xl mx-auto min-h-[400px] w-full">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="w-16 h-16 mx-auto mb-4 text-gray-200"
+          >
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+          </svg>
+          <h3 className="text-lg font-bold text-gray-900 mb-1">Brak wyników</h3>
+          <p className="text-gray-500 max-w-sm mt-1">
+            Nie znaleźliśmy żadnych szablonów pasujących do obecnego
+            wyszukiwania lub wybranych filtrów.
+          </p>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       <Modal

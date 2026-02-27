@@ -24,6 +24,7 @@ export const ParticipantsPage = ({
   onShowSnackbar,
 }: ParticipantsPageProps) => {
   const [search, setSearch] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
@@ -36,12 +37,19 @@ export const ParticipantsPage = ({
   });
   const [deleteAllModal, setDeleteAllModal] = useState(false);
 
-  const filteredParticipants = participants.filter(
-    (p) =>
+  const filteredParticipants = participants.filter((p) => {
+    const matchesSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.email?.toLowerCase().includes(search.toLowerCase()) ||
-      p.company?.toLowerCase().includes(search.toLowerCase()),
-  );
+      p.company?.toLowerCase().includes(search.toLowerCase());
+
+    if (!matchesSearch) return false;
+
+    if (activeFilter === "with_email") return !!p.email;
+    if (activeFilter === "with_score")
+      return p.score !== undefined && p.score !== null;
+    return true;
+  });
 
   const handleEdit = (participant: Participant) => {
     setEditingId(participant.id);
@@ -148,7 +156,7 @@ export const ParticipantsPage = ({
   };
 
   return (
-    <div className="w-full animate-in fade-in duration-300">
+    <div className="w-full h-full flex flex-col animate-in fade-in duration-300">
       {/* Page Header */}
       <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
@@ -180,6 +188,13 @@ export const ParticipantsPage = ({
         value={search}
         onChange={setSearch}
         placeholder="Szukaj uczestnika..."
+        filters={[
+          { label: "Wszyscy", value: "all" },
+          { label: "Z e-mailem", value: "with_email" },
+          { label: "Z wynikiem", value: "with_score" },
+        ]}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
       >
         {participants.length > 0 && (
           <button
@@ -194,72 +209,65 @@ export const ParticipantsPage = ({
             >
               <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
             </svg>
-            Usuń wszystkich
+            <span className="hidden md:inline">Usuń wszystkich</span>
           </button>
         )}
       </SearchToolbar>
 
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-        {/* Content */}
-        {filteredParticipants.length > 0 && (
-          <>
-            {/* ... Table (keeping existing table structure) ... */}
-            <div className="overflow-x-auto w-full">
-              <table className="w-full min-w-full table-auto">
-                <thead className="bg-gray-50/50">
-                  <tr>
-                    <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider pl-6">
-                      Imię i Nazwisko
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">
-                      Email
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">
-                      Firma
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">
-                      Wynik
-                    </th>
-                    <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">
-                      Data
-                    </th>
+      {filteredParticipants.length > 0 && (
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden shrink-0">
+          <div className="overflow-x-auto w-full">
+            <table className="w-full min-w-full table-auto">
+              <thead className="bg-gray-50/50">
+                <tr>
+                  <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider pl-6">
+                    Imię i Nazwisko
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                    Email
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                    Firma
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                    Wynik
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-500 text-xs uppercase tracking-wider">
+                    Data
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredParticipants.map((participant) => (
+                  <tr
+                    key={participant.id}
+                    className="group hover:bg-gray-50/80 transition-colors"
+                  >
+                    <ParticipantRow
+                      participant={participant}
+                      isEditing={editingId === participant.id}
+                      onEditStart={handleEdit}
+                      onSave={handleSave}
+                      onCancelEdit={() => setEditingId(null)}
+                      onDelete={handleDelete}
+                    />
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {filteredParticipants.map((participant) => (
-                    <tr
-                      key={participant.id}
-                      className="group hover:bg-gray-50/80 transition-colors"
-                    >
-                      <ParticipantRow
-                        participant={participant}
-                        isEditing={editingId === participant.id}
-                        onEditStart={handleEdit}
-                        onSave={handleSave}
-                        onCancelEdit={() => setEditingId(null)}
-                        onDelete={handleDelete}
-                      />
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-            {/* Footer */}
-            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/30">
-              <p className="text-sm text-gray-500">
-                Wyświetlono {filteredParticipants.length} z{" "}
-                {participants.length}
-              </p>
-            </div>
-          </>
-        )}
-      </div>
+          {/* Footer */}
+          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/30">
+            <p className="text-sm text-gray-500">
+              Wyświetlono {filteredParticipants.length} z {participants.length}
+            </p>
+          </div>
+        </div>
+      )}
 
       {filteredParticipants.length === 0 && (
-        <div className="mt-8">
-          <ParticipantEmptyState search={search} />
-        </div>
+        <ParticipantEmptyState search={search} activeFilter={activeFilter} />
       )}
 
       {/* Add Method Modal */}
@@ -268,7 +276,7 @@ export const ParticipantsPage = ({
         onClose={() => setAddMethodModalOpen(false)}
         title="Dodaj uczestników"
         type="info"
-      // Custom content instead of standard message
+        // Custom content instead of standard message
       >
         <div className="grid grid-cols-2 gap-4">
           <button

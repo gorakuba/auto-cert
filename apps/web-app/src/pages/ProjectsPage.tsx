@@ -16,12 +16,41 @@ export const ProjectsPage = ({
   onNewProject,
 }: ProjectsPageProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeSort, setActiveSort] = useState("newest");
 
   const filteredProjects = useMemo(() => {
-    return projects.filter((project) =>
+    let result = projects.filter((project) =>
       project.templateName.toLowerCase().includes(searchQuery.toLowerCase()),
     );
-  }, [projects, searchQuery]);
+
+    switch (activeSort) {
+      case "oldest":
+        result = result.sort(
+          (a, b) =>
+            new Date(a.lastEdited).getTime() - new Date(b.lastEdited).getTime(),
+        );
+        break;
+      case "alpha_asc":
+        result = result.sort((a, b) =>
+          a.templateName.localeCompare(b.templateName),
+        );
+        break;
+      case "alpha_desc":
+        result = result.sort((a, b) =>
+          b.templateName.localeCompare(a.templateName),
+        );
+        break;
+      case "newest":
+      default:
+        result = result.sort(
+          (a, b) =>
+            new Date(b.lastEdited).getTime() - new Date(a.lastEdited).getTime(),
+        );
+        break;
+    }
+
+    return result;
+  }, [projects, searchQuery, activeSort]);
 
   return (
     <div className="w-full h-full flex flex-col animate-in fade-in duration-300">
@@ -58,6 +87,14 @@ export const ProjectsPage = ({
         value={searchQuery}
         onChange={setSearchQuery}
         placeholder="Szukaj projektu..."
+        filters={[
+          { label: "Od najnowszych", value: "newest" },
+          { label: "Od najstarszych", value: "oldest" },
+          { label: "Od A do Z", value: "alpha_asc" },
+          { label: "Od Z do A", value: "alpha_desc" },
+        ]}
+        activeFilter={activeSort}
+        onFilterChange={setActiveSort}
       />
 
       {/* Projects Grid */}

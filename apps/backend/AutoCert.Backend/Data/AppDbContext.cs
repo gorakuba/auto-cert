@@ -10,6 +10,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Setting>().HasKey(s => s.Key);
+        modelBuilder.Entity<Setting>().HasKey(s => new { s.Key, s.GuestId });
     }
 }

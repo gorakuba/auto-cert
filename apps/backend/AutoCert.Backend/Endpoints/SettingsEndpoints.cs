@@ -10,9 +10,9 @@ public static class SettingsEndpoints
         var group = app.MapGroup("/api/settings").WithTags("Settings");
 
         // GET /api/settings/{key}
-        group.MapGet("/{key}", async (AppDbContext db, string key) =>
+        group.MapGet("/{key}", async (AppDbContext db, string key, [Microsoft.AspNetCore.Mvc.FromHeader(Name = "X-Guest-ID")] string guestId) =>
         {
-            var setting = await db.Settings.FindAsync(key);
+            var setting = await db.Settings.FindAsync(key, guestId);
             return setting is null
                 ? Results.NotFound(new { key, value = (string?)null })
                 : Results.Ok(new { key = setting.Key, value = setting.Value });
@@ -21,12 +21,12 @@ public static class SettingsEndpoints
         .WithSummary("Retrieves a setting value by key");
 
         // PUT /api/settings/{key}
-        group.MapPut("/{key}", async (AppDbContext db, string key, SettingValueDto dto) =>
+        group.MapPut("/{key}", async (AppDbContext db, string key, [Microsoft.AspNetCore.Mvc.FromHeader(Name = "X-Guest-ID")] string guestId, SettingValueDto dto) =>
         {
-            var existing = await db.Settings.FindAsync(key);
+            var existing = await db.Settings.FindAsync(key, guestId);
             if (existing is null)
             {
-                db.Settings.Add(new Setting { Key = key, Value = dto.Value });
+                db.Settings.Add(new Setting { Key = key, GuestId = guestId, Value = dto.Value });
             }
             else
             {

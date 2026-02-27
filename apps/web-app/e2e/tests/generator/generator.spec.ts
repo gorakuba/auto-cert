@@ -13,17 +13,24 @@ test.describe("Generator Feature", () => {
 
     // 2. Clear data
     await request.delete("/api/participants");
-    await request.put("/api/settings/auto-cert-recent-projects", { data: { value: "" } });
-    await request.put("/api/settings/auto-cert-custom-templates", { data: { value: "[]" } });
+    await request.put("/api/settings/auto-cert-recent-projects", {
+      data: { value: "" },
+    });
+    await request.put("/api/settings/auto-cert-custom-templates", {
+      data: { value: "[]" },
+    });
 
     await page.goto("/");
     await page.waitForLoadState("networkidle");
   });
 
-  test("opens generator via sidebar when data and template exist", async ({ page, request }) => {
+  test("opens generator via sidebar when data and template exist", async ({
+    page,
+    request,
+  }) => {
     // Seed data
     await request.post("/api/participants/bulk", {
-      data: [{ id: "1", name: "Jan Testowy" }]
+      data: [{ id: "1", name: "Jan Testowy" }],
     });
 
     await request.put("/api/settings/auto-cert-selected-template", {
@@ -32,8 +39,8 @@ test.describe("Generator Feature", () => {
           id: "t1",
           name: "Test T",
           path: "/templates/template1.svg",
-        })
-      }
+        }),
+      },
     });
 
     await page.reload();

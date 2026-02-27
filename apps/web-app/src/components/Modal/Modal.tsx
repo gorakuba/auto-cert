@@ -183,7 +183,7 @@ export function Modal({
             {/* Show icon only if it's an alert-style message without complex children, or if explicitly desired. 
                 For cleanliness, let's show Icon + Message at top if message exists. */}
             {(message && type !== "info") || (message && type === "info") ? (
-              <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-center gap-4">
                 {type !== "info" && (
                   <div
                     className={`p-3 rounded-full h-fit w-fit flex-shrink-0 ${theme.iconBg} ${theme.iconColor}`}
