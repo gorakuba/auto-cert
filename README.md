@@ -11,7 +11,7 @@ Nowoczesna aplikacja do generowania certyfikatów z podglądem na żywo, eksport
 yarn
 
 # Uruchomienie
-yarn dev
+yarn start
 
 # Otwórz http://localhost:5173
 ```
@@ -38,16 +38,17 @@ yarn dev
 
 - **Tabela** - wszystkie dane w jednym miejscu
 - **Edycja inline** - kliknij i edytuj
-- **Wyszukiwarka** - szybkie filtrowanie
+- **Wyszukiwarka i filtry** - zaawansowane filtrowanie z użyciem "chips" (np. tylko z e-mailem, z wynikiem)
 - **Dodawanie/usuwanie** - pełne CRUD
-- **Auto-zapis** - localStorage
+- **Auto-zapis** - automatyczna synchronizacja z bazą (API)
 
 ### 🎨 Wybór Szablonów
 
 - **3 szablony domyślne** - Klasyczny, Nowoczesny, Minimalistyczny
 - **Galeria kart** - podgląd miniatur
 - **Kategorie** - Business, Education, Sport
-- **Wsparcie dla własnych** - localStorage
+- **Filtrowanie szablonów** - przełączanie między szablonami wbudowanymi i własnymi
+- **Wsparcie dla własnych** - importowane lokalnie i zapisywane przez API
 
 ### 🖼️ Generator z Podglądem
 
@@ -157,7 +158,7 @@ yarn
 # Uruchamia:
 # - Frontend: http://localhost:5173
 # - Backend: http://localhost:5050 (Swagger: /swagger)
-yarn dev
+yarn start
 
 # Budowanie wersji produkcyjnej
 yarn web-app:build

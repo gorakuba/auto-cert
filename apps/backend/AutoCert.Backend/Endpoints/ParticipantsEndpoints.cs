@@ -10,16 +10,13 @@ public static class ParticipantsEndpoints
     {
         var group = app.MapGroup("/api/participants").WithTags("Participants");
 
-        // GET /api/participants - Retrieve all participants
         group.MapGet("/", async (AppDbContext db) =>
             await db.Participants.ToListAsync())
         .WithName("GetParticipants")
         .WithSummary("Retrieves a list of all participants");
 
-        // POST /api/participants/bulk - Replace the entire participant list
         group.MapPost("/bulk", async (AppDbContext db, List<Participant> participants) =>
         {
-            // Remove existing and insert new (bulk replace)
             db.Participants.RemoveRange(db.Participants);
             await db.SaveChangesAsync();
 
@@ -37,7 +34,6 @@ public static class ParticipantsEndpoints
         .WithName("BulkSetParticipants")
         .WithSummary("Replaces the participant list with a new one (bulk upsert)");
 
-        // DELETE /api/participants - Delete all participants
         group.MapDelete("/", async (AppDbContext db) =>
         {
             db.Participants.RemoveRange(db.Participants);

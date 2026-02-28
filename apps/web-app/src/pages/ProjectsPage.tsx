@@ -25,7 +25,6 @@ export const ProjectsPage = ({
 
   return (
     <div className="w-full h-full flex flex-col animate-in fade-in duration-300">
-      {/* Header */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Twoje Projekty</h1>
@@ -53,14 +52,12 @@ export const ProjectsPage = ({
         </button>
       </header>
 
-      {/* Search & Filter Bar */}
       <SearchToolbar
         value={searchQuery}
         onChange={setSearchQuery}
         placeholder="Szukaj projektu..."
       />
 
-      {/* Projects Grid */}
       {filteredProjects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProjects.map((project) => (
@@ -68,7 +65,6 @@ export const ProjectsPage = ({
               key={project.id}
               className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group overflow-hidden flex flex-col"
             >
-              {/* Thumbnail */}
               <div className="h-40 bg-gray-100 relative overflow-hidden">
                 {project.templateThumbnail ? (
                   <img
@@ -95,7 +91,6 @@ export const ProjectsPage = ({
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
               </div>
 
-              {/* Content */}
               <div className="p-5 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-2">
                   <h3

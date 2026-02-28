@@ -94,7 +94,6 @@ export const Dashboard = ({
 
   return (
     <div className="w-full">
-      {/* Top Header */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
@@ -106,7 +105,6 @@ export const Dashboard = ({
         </div>
       </header>
 
-      {/* Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
           <div className="flex items-start justify-between mb-4">
@@ -195,7 +193,6 @@ export const Dashboard = ({
         </div>
       </div>
 
-      {/* Content Tabs */}
       <div className="flex gap-6 flex-col xl:flex-row">
         <div className="flex-1 space-y-6">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
@@ -316,7 +313,6 @@ export const Dashboard = ({
           </div>
         </div>
 
-        {/* Right Column (Activity) */}
         <div className="w-full xl:w-96 flex-shrink-0">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full">
             <h3 className="text-lg font-bold text-gray-900 mb-6">

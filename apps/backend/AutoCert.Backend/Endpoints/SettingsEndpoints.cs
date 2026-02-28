@@ -9,7 +9,6 @@ public static class SettingsEndpoints
     {
         var group = app.MapGroup("/api/settings").WithTags("Settings");
 
-        // GET /api/settings/{key}
         group.MapGet("/{key}", async (AppDbContext db, string key) =>
         {
             var setting = await db.Settings.FindAsync(key);
@@ -20,7 +19,6 @@ public static class SettingsEndpoints
         .WithName("GetSetting")
         .WithSummary("Retrieves a setting value by key");
 
-        // PUT /api/settings/{key}
         group.MapPut("/{key}", async (AppDbContext db, string key, SettingValueDto dto) =>
         {
             var existing = await db.Settings.FindAsync(key);

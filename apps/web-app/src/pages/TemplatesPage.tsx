@@ -109,11 +109,10 @@ export const TemplatesPage = ({
             key={template.id}
             onClick={() => onSelect(template)}
             className={`group relative border rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${selectedTemplate?.id === template.id
-                ? "bg-indigo-50/30 border-indigo-600 border-2 ring-4 ring-indigo-50 shadow-lg"
-                : "bg-white border-gray-200 hover:border-indigo-300"
+              ? "bg-indigo-50/30 border-indigo-600 border-2 ring-4 ring-indigo-50 shadow-lg"
+              : "bg-white border-gray-200 hover:border-indigo-300"
               }`}
           >
-            {/* Selected Badge */}
             {selectedTemplate?.id === template.id && (
               <div className="absolute top-0 right-0 z-20">
                 <div className="bg-indigo-600 text-white px-4 py-1.5 rounded-bl-xl font-semibold text-xs shadow-sm flex items-center gap-1.5">
@@ -134,7 +133,6 @@ export const TemplatesPage = ({
               </div>
             )}
 
-            {/* Delete Button for Custom Templates */}
             {template.isCustom && (
               <button
                 onClick={(e) => handleDeleteClick(e, template)}
@@ -177,7 +175,6 @@ export const TemplatesPage = ({
         ))}
       </div>
 
-      {/* Delete Confirmation Modal */}
       <Modal
         isOpen={deleteModal.isOpen}
         onClose={() =>

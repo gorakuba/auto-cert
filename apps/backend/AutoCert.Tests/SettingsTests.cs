@@ -1,5 +1,5 @@
 using System.Net.Http.Json;
-using AutoCert.Backend.Endpoints; // For SettingValueDto
+using AutoCert.Backend.Endpoints;
 using Xunit;
 
 namespace AutoCert.Tests;
@@ -11,22 +11,18 @@ public class SettingsTests : IntegrationTestBase
     [Fact]
     public async Task GetSetting_ReturnsNotFound_IfKeyDoesNotExist()
     {
-        // Act
         var response = await Client.GetAsync("/api/settings/non-existent-key");
 
-        // Assert
         Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
     }
 
     [Fact]
     public async Task PutSetting_CreatesAndUpdatesValue()
     {
-        // Arrange
         var key = "test-setting-key";
         var initialValue = "initial-value";
         var updatedValue = "updated-value";
 
-        // Act 1: Create
         var createResponse = await Client.PutAsJsonAsync($"/api/settings/{key}", new SettingValueDto(initialValue));
         createResponse.EnsureSuccessStatusCode();
 
@@ -34,7 +30,6 @@ public class SettingsTests : IntegrationTestBase
         var data1 = await getResponse1.Content.ReadFromJsonAsync<SettingResponse>();
         Assert.Equal(initialValue, data1?.Value);
 
-        // Act 2: Update
         var updateResponse = await Client.PutAsJsonAsync($"/api/settings/{key}", new SettingValueDto(updatedValue));
         updateResponse.EnsureSuccessStatusCode();
 
