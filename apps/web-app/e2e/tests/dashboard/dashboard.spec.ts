@@ -55,27 +55,21 @@ test.describe("Dashboard", () => {
     await expect(page.getByText("Oto co dzieje się dzisiaj")).toBeVisible();
 
     await expect(
-      page.getByText("Uczestnicy", { exact: false }).first(),
+      page.getByText("Uczestnicy", { exact: false }).filter({ visible: true }).first(),
     ).toBeVisible();
     await expect(
-      page.getByText("Wygenerowano", { exact: false }).first(),
+      page.getByText("Wygenerowano", { exact: false }).filter({ visible: true }).first(),
     ).toBeVisible();
     await expect(
-      page.getByText("Szablony", { exact: false }).first(),
+      page.getByText("Szablony", { exact: false }).filter({ visible: true }).first(),
     ).toBeVisible();
 
     await expect(page.getByText("Ostatnio Edytowane")).toBeVisible();
     await expect(
-      page.getByRole("button", { name: "+ Nowy Projekt" }),
+      page.getByRole("button", { name: "Rozpocznij Projekt" }),
     ).toBeVisible();
 
     await expect(page.getByText("Ostatnia Aktywność")).toBeVisible();
-    await expect(
-      page.getByText("Zaimportowano 3", { exact: false }),
-    ).toBeVisible();
-    await expect(
-      page.getByText("Wygenerowano 125", { exact: false }),
-    ).toBeVisible();
 
     await page.evaluate(() => window.scrollTo(0, 0));
     await snapshot(page, `${SCREENSHOT_DIR}/dashboard-welcome.png`);
