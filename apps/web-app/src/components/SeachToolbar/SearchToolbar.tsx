@@ -1,8 +1,16 @@
+export interface FilterOption {
+  id: string;
+  label: string;
+}
+
 interface SearchToolbarProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   children?: React.ReactNode;
+  filters?: FilterOption[];
+  activeFilter?: string;
+  onFilterChange?: (filterId: string) => void;
 }
 
 export const SearchToolbar = ({
@@ -10,9 +18,12 @@ export const SearchToolbar = ({
   onChange,
   placeholder = "Szukaj...",
   children,
+  filters,
+  activeFilter,
+  onFilterChange,
 }: SearchToolbarProps) => {
   return (
-    <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div className="mb-6 flex flex-col lg:flex-row gap-4 items-center w-full animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div className="flex-1 relative w-full">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -31,11 +42,30 @@ export const SearchToolbar = ({
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 bg-gray-50 border-transparent focus:border-indigo-500 focus:bg-white rounded-lg focus:ring-2 focus:ring-indigo-500/20 text-gray-900 placeholder-gray-400 transition-all"
+          className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 focus:border-indigo-500 rounded-xl focus:ring-4 focus:ring-indigo-500/10 text-gray-900 placeholder-gray-400 transition-all shadow-sm"
         />
       </div>
+
+      {filters && filters.length > 0 && onFilterChange && (
+        <div className="flex items-center gap-2 overflow-x-auto w-full lg:w-auto scbar-hide pb-2 lg:pb-0">
+          {filters.map((filter) => (
+            <button
+              key={filter.id}
+              onClick={() => onFilterChange(filter.id)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap shadow-sm border ${
+                activeFilter === filter.id
+                  ? "bg-indigo-600 text-white border-indigo-600 shadow-indigo-200"
+                  : "bg-white text-gray-600 border-gray-200 hover:border-indigo-300 hover:text-indigo-600"
+              }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       {children && (
-        <div className="flex items-center gap-2 w-full md:w-auto justify-end">
+        <div className="flex items-center gap-2 w-full lg:w-auto justify-end">
           {children}
         </div>
       )}

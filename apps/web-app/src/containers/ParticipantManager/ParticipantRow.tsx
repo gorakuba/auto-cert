@@ -28,8 +28,6 @@ export const ParticipantRow = ({
 }: ParticipantRowProps) => {
   const [formData, setFormData] = useState<Participant>(participant);
 
-  // Update local state if the participant prop changes and we are not editing
-  // or if we just started editing
   if (isEditing && formData.id !== participant.id) {
     setFormData(participant);
   }

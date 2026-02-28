@@ -118,21 +118,6 @@ export function Modal({
 
   const handleConfirm = () => {
     if (onConfirm) onConfirm();
-    // Only close if no onConfirm (or if we want explicit close control, but typically confirm closes)
-    // However, existing usage implies close on confirm? No, existing usage: confirmDelete calls onClose internally if needed or just deletes.
-    // Wait, Check App.tsx or ParticipantsPage usage. `handleDelete` -> `setDeleteModal`. `confirmDelete` -> delete and `setDeleteModal(false)`.
-    // BUT the Modal logic in line 79 closes it: `onClose()`.
-    // If we want manual control (e.g. form validation fail), we shouldn't auto close.
-    // But for now let's stick to existing behavior unless manual add needs change.
-    // Manual add logic in ParticipantsPage: `confirmManualAdd` calls `setManualAddOpen(false)`.
-    // If Modal auto-closes on onConfirm, then it might be redundant or conflict.
-    // Let's modify handleConfirm to NOT call onClose if onConfirm is present, assuming onConfirm handles it?
-    // Or just leave it as is. Existing: `handleConfirm` -> `if(onConfirm) onConfirm(); onClose();`.
-    // If I want to validate form, I might not want to close.
-    // But for simplistic approach:
-    // If onConfirm is passed, it does logic. Then Modal closes.
-    // For Manual Add, I pass `onConfirm` which validates. If validation fails, it shows snackbar/returns.
-    // If it returns, Modal still closes if I keep `onClose()`.
     if (shouldAutoClose) onClose();
   };
 
@@ -154,7 +139,6 @@ export function Modal({
         role="dialog"
         aria-modal="true"
       >
-        {/* Header */}
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-white flex-shrink-0">
           <h3 className="text-lg font-bold text-gray-900 leading-6">{title}</h3>
           <button
@@ -177,13 +161,10 @@ export function Modal({
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6 overflow-y-auto flex-1">
           <div className="flex flex-col gap-5">
-            {/* Show icon only if it's an alert-style message without complex children, or if explicitly desired. 
-                For cleanliness, let's show Icon + Message at top if message exists. */}
             {(message && type !== "info") || (message && type === "info") ? (
-              <div className="flex items-center gap-4 mb-4">
+              <div className="flex items-center gap-4">
                 {type !== "info" && (
                   <div
                     className={`p-3 rounded-full h-fit w-fit flex-shrink-0 ${theme.iconBg} ${theme.iconColor}`}
@@ -203,7 +184,6 @@ export function Modal({
           </div>
         </div>
 
-        {/* Footer */}
         {(cancelText || onConfirm) && (
           <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-end gap-3 flex-shrink-0">
             {cancelText && (

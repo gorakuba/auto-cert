@@ -1,4 +1,6 @@
+import { useState, useMemo } from "react";
 import type { TemplateInfo } from "../types";
+import { SearchToolbar } from "../components/SeachToolbar/SearchToolbar";
 
 interface TemplateSelectorProps {
   templates: TemplateInfo[];
@@ -17,11 +19,18 @@ export const TemplateSelector = ({
   onDelete,
   onClose,
 }: TemplateSelectorProps) => {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredTemplates = useMemo(() => {
+    return templates.filter((template) =>
+      template.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+  }, [templates, searchQuery]);
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Sprawdź czy to plik graficzny
     if (!file.type.startsWith("image/")) {
       alert("Proszę wybrać plik graficzny (PNG, JPG, SVG)");
       return;
@@ -46,9 +55,8 @@ export const TemplateSelector = ({
   };
 
   const handleSelect = (template: TemplateInfo) => {
-    // Jeśli klikamy na już wybrany szablon, odznacz go
     if (selectedTemplate?.id === template.id) {
-      onSelect(null as any); // Odznaczenie szablonu
+      onSelect(null as any);
       onClose();
     } else {
       onSelect(template);
@@ -60,7 +68,7 @@ export const TemplateSelector = ({
     e: React.MouseEvent,
     templateToDelete: TemplateInfo,
   ) => {
-    e.stopPropagation(); // Zapobiega kliknięciu na kartę
+    e.stopPropagation();
     onDelete(templateToDelete.id);
   };
 
@@ -85,7 +93,6 @@ export const TemplateSelector = ({
         className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[85vh] overflow-hidden flex flex-col ring-1 ring-black/5 animate-in zoom-in-95 duration-300"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="px-8 py-6 flex items-center justify-between bg-white z-10 border-b border-gray-50">
           <div className="flex-1">
             <h2 className="text-xl font-bold text-gray-900 tracking-tight">
@@ -97,7 +104,6 @@ export const TemplateSelector = ({
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Deselect Button */}
             {selectedTemplate && (
               <button
                 onClick={() => {
@@ -118,7 +124,6 @@ export const TemplateSelector = ({
               </button>
             )}
 
-            {/* Upload Custom Template Button */}
             <label className="px-4 py-2 bg-indigo-50 text-indigo-700 text-sm font-bold rounded-lg hover:bg-indigo-100 transition-colors cursor-pointer flex items-center gap-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -153,33 +158,45 @@ export const TemplateSelector = ({
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-8 bg-gray-50/50">
-          {templates.length === 0 ? (
-            <div className="text-center py-12">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-16 h-16 mx-auto mb-4 text-gray-300"
-              >
-                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
-              </svg>
-              <p className="text-gray-600">Brak dostępnych szablonów</p>
+        <div className="px-8 pt-6 pb-2 bg-gray-50/50">
+          <SearchToolbar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Szukaj szablonu..."
+          />
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-8 pb-8 pt-2 bg-gray-50/50 flex flex-col">
+          {filteredTemplates.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-center opacity-60 min-h-[300px]">
+              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6 text-gray-300">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-12 h-12"
+                >
+                  <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">
+                Brak wyników
+              </h2>
+              <p className="text-gray-500 max-w-sm mb-8">
+                Brak dostępnych szablonów do wyboru.
+              </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {templates.map((template) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
+              {filteredTemplates.map((template) => (
                 <div
                   key={template.id}
                   onClick={() => handleSelect(template)}
-                  className={`group relative bg-white border rounded-xl overflow-hidden cursor-pointer transition-all hover:shadow-xl hover:-translate-y-1 ${
-                    selectedTemplate?.id === template.id
-                      ? "border-indigo-500 ring-4 ring-indigo-50 shadow-lg"
-                      : "border-gray-200 hover:border-indigo-300"
-                  }`}
+                  className={`group relative bg-white border rounded-xl overflow-hidden cursor-pointer transition-all ${selectedTemplate?.id === template.id
+                    ? "border-indigo-500 ring-4 ring-indigo-50 shadow-lg"
+                    : "border-gray-200 hover:border-indigo-300"
+                    }`}
                 >
-                  {/* Selected Badge */}
                   {selectedTemplate?.id === template.id && (
                     <div className="absolute top-3 right-3 z-10 bg-indigo-600 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shadow-sm">
                       <svg
@@ -194,7 +211,6 @@ export const TemplateSelector = ({
                     </div>
                   )}
 
-                  {/* Delete Button for Custom Templates */}
                   {template.isCustom && (
                     <button
                       onClick={(e) => handleDeleteCustomTemplate(e, template)}
@@ -212,12 +228,11 @@ export const TemplateSelector = ({
                     </button>
                   )}
 
-                  {/* Template Preview */}
                   <div className="aspect-[4/3] bg-gray-100/50 overflow-hidden relative border-b border-gray-50">
                     <img
                       src={template.thumbnail}
                       alt={template.name}
-                      className="w-full h-full object-contain p-6 group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-contain p-6"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.style.display = "none";
@@ -234,8 +249,7 @@ export const TemplateSelector = ({
                     />
                   </div>
 
-                  {/* Template Info */}
-                  <div className="p-5">
+                  <div className="p-4 pb-3">
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="font-bold text-gray-900 text-lg tracking-tight">
                         {template.name}
@@ -250,7 +264,7 @@ export const TemplateSelector = ({
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
+                    <p className="text-sm text-gray-500 mt-1 line-clamp-1 truncate">
                       {template.description}
                     </p>
                     {template.isCustom && (
@@ -273,7 +287,6 @@ export const TemplateSelector = ({
           )}
         </div>
 
-        {/* Footer */}
         <div className="px-8 py-6 border-t border-gray-50 bg-white flex items-center justify-between z-10">
           <div className="text-sm text-gray-500">
             {selectedTemplate ? (

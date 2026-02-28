@@ -25,8 +25,8 @@ export interface RecentProject {
   id: string;
   templateId: string;
   templateName: string;
-  templateThumbnail: string; // Add this to show preview
+  templateThumbnail: string;
   participants: Participant[];
   participantsCount: number;
-  lastEdited: number; // timestamp
+  lastEdited: number;
 }

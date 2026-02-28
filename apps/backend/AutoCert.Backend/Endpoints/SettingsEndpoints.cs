@@ -12,9 +12,7 @@ public static class SettingsEndpoints
         group.MapGet("/{key}", async (AppDbContext db, string key) =>
         {
             var setting = await db.Settings.FindAsync(key);
-            return setting is null
-                ? Results.NotFound(new { key, value = (string?)null })
-                : Results.Ok(new { key = setting.Key, value = setting.Value });
+            return Results.Ok(new { key, value = setting?.Value });
         })
         .WithName("GetSetting")
         .WithSummary("Retrieves a setting value by key");

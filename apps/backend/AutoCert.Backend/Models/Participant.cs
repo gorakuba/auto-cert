@@ -6,4 +6,5 @@ public class Participant
     public string Name { get; set; } = string.Empty;
     public string? Email { get; set; }
     public string? Extra { get; set; }
+    public string GuestId { get; set; } = string.Empty;
 }

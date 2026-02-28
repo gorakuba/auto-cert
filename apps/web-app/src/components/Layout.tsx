@@ -26,8 +26,7 @@ export const Layout = ({
         counts={counts}
       />
 
-      {/* Main Content Area */}
-      <div className="flex-1 lg:ml-72 p-8 overflow-y-auto h-screen w-full">
+      <div className="flex-1 lg:ml-72 p-8 pt-20 lg:pt-8 overflow-y-auto h-screen w-full">
         {children}
       </div>
     </div>

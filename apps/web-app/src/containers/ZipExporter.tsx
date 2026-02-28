@@ -36,7 +36,6 @@ export const ZipExporter = ({
   const [exporting, setExporting] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Default certificate settings
   const namePosition = { x: 50, y: 50 };
   const fontSize = 48;
   const fontColor = "#000000";
@@ -88,10 +87,8 @@ export const ZipExporter = ({
         canvas.width = img.width;
         canvas.height = img.height;
 
-        // Draw template
         ctx.drawImage(img, 0, 0);
 
-        // Draw name
         ctx.font = `${fontSize}px ${fontFamily}`;
         ctx.fillStyle = fontColor;
         ctx.textAlign = "center";
@@ -102,20 +99,17 @@ export const ZipExporter = ({
 
         ctx.fillText(participant.name, x, y);
 
-        // Convert canvas to PDF
         const imgData = canvas.toDataURL("image/png");
         const pdf = new jsPDF({
           orientation: canvas.width > canvas.height ? "landscape" : "portrait",
           unit: "px",
           format: [canvas.width, canvas.height],
         });
-
         pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
         const pdfBlob = pdf.output("blob");
         resolve(pdfBlob);
       };
       img.onerror = () => {
-        // Fallback with no template
         canvas.width = 800;
         canvas.height = 600;
         ctx.fillStyle = "#f3f4f6";
@@ -127,16 +121,14 @@ export const ZipExporter = ({
         const y = (namePosition.y / 100) * 600;
         ctx.fillText(participant.name, x, y);
 
-        // Convert canvas to PDF
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF({
+        const imgData2 = canvas.toDataURL("image/png");
+        const pdf2 = new jsPDF({
           orientation: "landscape",
           unit: "px",
           format: [800, 600],
         });
-
-        pdf.addImage(imgData, "PNG", 0, 0, 800, 600);
-        const pdfBlob = pdf.output("blob");
+        pdf2.addImage(imgData2, "PNG", 0, 0, 800, 600);
+        const pdfBlob = pdf2.output("blob");
         resolve(pdfBlob);
       };
       img.src = template.path;
@@ -156,7 +148,6 @@ export const ZipExporter = ({
       return;
     }
 
-    // Generate all certificates
     for (let i = 0; i < participants.length; i++) {
       const participant = participants[i];
       setCurrentName(participant.name);
@@ -171,11 +162,9 @@ export const ZipExporter = ({
         folder.file(fileName, blob);
       }
 
-      // Small delay to show progress
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
 
-    // Generate and download ZIP
     try {
       const content = await zip.generateAsync({ type: "blob" });
       const url = URL.createObjectURL(content);
@@ -229,7 +218,6 @@ export const ZipExporter = ({
 
         {/* Content */}
         <div className="p-6">
-          {/* Progress Bar */}
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-gray-700">Postęp</span>
@@ -265,7 +253,6 @@ export const ZipExporter = ({
             <p>Proszę czekać, nie zamykaj tego okna...</p>
           </div>
 
-          {/* Hidden canvas for rendering */}
           <canvas ref={canvasRef} className="hidden" />
         </div>
 
@@ -289,7 +276,6 @@ export const ZipExporter = ({
         )}
       </div>
 
-      {/* Alert Modal */}
       <Modal
         isOpen={alertModal.isOpen}
         onClose={closeAlert}

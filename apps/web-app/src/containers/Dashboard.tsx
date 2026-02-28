@@ -68,7 +68,6 @@ export const Dashboard = ({
       });
     }
 
-    // Default "welcome" activity if empty
     if (activities.length === 0) {
       activities.push({
         text: "Witaj w nowym dashboardzie!",
@@ -96,9 +95,7 @@ export const Dashboard = ({
     <div className="w-full">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Witaj! 👋
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900">Witaj! 👋</h1>
           <p className="text-gray-500 mt-1">
             Oto co dzieje się dzisiaj w Twoich certyfikatach.
           </p>
@@ -196,17 +193,9 @@ export const Dashboard = ({
       <div className="flex gap-6 flex-col xl:flex-row">
         <div className="flex-1 space-y-6">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-gray-900">
-                Ostatnio Edytowane
-              </h2>
-              <button
-                onClick={onNewProject}
-                className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-4 py-2 rounded-lg hover:bg-indigo-100 transition-colors"
-              >
-                + Nowy Projekt
-              </button>
-            </div>
+            <h2 className="text-xl font-bold text-gray-900 mb-6">
+              Ostatnio Edytowane
+            </h2>
 
             {recentProjects && recentProjects.length > 0 ? (
               <div className="grid grid-cols-1 gap-4">

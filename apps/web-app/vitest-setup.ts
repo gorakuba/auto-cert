@@ -1,7 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { vi } from "vitest";
 
-// Mock localStorage
 const localStorageMock = {
   getItem: vi.fn(),
   setItem: vi.fn(),
@@ -10,7 +9,6 @@ const localStorageMock = {
 };
 global.localStorage = localStorageMock as any;
 
-// Mock HTMLCanvasElement
 HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   fillRect: vi.fn(),
   clearRect: vi.fn(),
@@ -42,6 +40,5 @@ HTMLCanvasElement.prototype.toDataURL = vi.fn(
   () => "data:image/png;base64,mock",
 );
 
-// Mock URL.createObjectURL
 global.URL.createObjectURL = vi.fn(() => "blob:mock-url");
 global.URL.revokeObjectURL = vi.fn();

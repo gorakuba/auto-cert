@@ -21,7 +21,7 @@ interface CertificateGeneratorProps {
   template: TemplateInfo | null;
   onGenerated: (count: number) => void;
   onSave?: () => void;
-  onExport?: () => void; // Added for ZIP export
+  onExport?: () => void;
   hasUnsavedChanges?: boolean;
 }
 
@@ -33,7 +33,6 @@ export const CertificateGenerator = ({
   onExport,
   hasUnsavedChanges,
 }: CertificateGeneratorProps) => {
-  // ... (keep state)
   const [currentIndex, setCurrentIndex] = useState(0);
   const [namePosition, setNamePosition] = useState({ x: 50, y: 50 });
   const [fontSize, setFontSize] = useState(48);
@@ -49,7 +48,6 @@ export const CertificateGenerator = ({
   }, [currentIndex, namePosition, fontSize, fontColor, fontFamily, template]);
 
   const drawCertificate = () => {
-    // ... (keep logic, too long to repeat, relying on context match)
     const canvas = canvasRef.current;
     if (!canvas || !template) return;
 
@@ -59,14 +57,11 @@ export const CertificateGenerator = ({
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
-      // Set canvas size to match image
       canvas.width = img.width;
       canvas.height = img.height;
 
-      // Draw template
       ctx.drawImage(img, 0, 0);
 
-      // Draw name
       ctx.font = `${fontSize}px ${fontFamily}`;
       ctx.fillStyle = fontColor;
       ctx.textAlign = "center";
@@ -79,7 +74,6 @@ export const CertificateGenerator = ({
     };
     img.onerror = () => {
       console.error("Failed to load template image");
-      // Draw fallback
       canvas.width = 800;
       canvas.height = 600;
       ctx.fillStyle = "#f3f4f6";
@@ -90,7 +84,6 @@ export const CertificateGenerator = ({
       ctx.fillText("Szablon niedostępny", 400, 250);
       ctx.fillText("(Wczytywanie...)", 400, 290);
 
-      // Still draw the name
       ctx.font = `${fontSize}px ${fontFamily}`;
       ctx.fillStyle = fontColor;
       const x = (namePosition.x / 100) * 800;
@@ -99,7 +92,7 @@ export const CertificateGenerator = ({
     };
     img.src = template.path;
   };
-  // ... (keep downloads)
+
   const downloadCurrent = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -149,7 +142,6 @@ export const CertificateGenerator = ({
 
   return (
     <div className="w-full h-full flex flex-col animate-in fade-in duration-300">
-      {/* Header with Save Button */}
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
@@ -164,11 +156,10 @@ export const CertificateGenerator = ({
         {onSave && (
           <button
             onClick={onSave}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${
-              hasUnsavedChanges
-                ? "bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100 shadow-sm animate-pulse"
-                : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
-            }`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${hasUnsavedChanges
+              ? "bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100 shadow-sm animate-pulse"
+              : "bg-white border-gray-200 text-gray-700 hover:bg-gray-50"
+              }`}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -188,7 +179,6 @@ export const CertificateGenerator = ({
       </div>
 
       <div className="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Preview Section */}
         <div className="lg:col-span-2 flex flex-col gap-6">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex-1 flex flex-col">
             <div className="flex items-center justify-between mb-6">
@@ -273,7 +263,6 @@ export const CertificateGenerator = ({
           </div>
         </div>
 
-        {/* Settings Column */}
         <div className="flex flex-col gap-6 h-full overflow-y-auto pr-1">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h3 className="font-bold text-gray-900 mb-6 flex items-center gap-2">
@@ -293,7 +282,6 @@ export const CertificateGenerator = ({
             </h3>
 
             <div className="space-y-6">
-              {/* Size */}
               <div>
                 <div className="flex justify-between items-center mb-2">
                   <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
@@ -313,7 +301,6 @@ export const CertificateGenerator = ({
                 />
               </div>
 
-              {/* Font Family */}
               <div>
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-2">
                   Czcionka
@@ -332,7 +319,6 @@ export const CertificateGenerator = ({
                 </select>
               </div>
 
-              {/* Color */}
               <div>
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-2">
                   Kolor
