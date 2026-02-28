@@ -32,10 +32,7 @@ public class IntegrationTestBase : IClassFixture<WebApplicationFactory<Program>>
             });
         });
 
-        // Ensure database is created
         using var scope = Factory.Services.CreateScope();
-        // We can't access AppDbContext here easily because Factory build happens later?
-        // Actually, CreateClient triggers build.
         Client = Factory.CreateClient();
     }
 }

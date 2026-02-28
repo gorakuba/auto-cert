@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
-import {
-  Layout,
-  Modal,
-  Snackbar,
-} from "./components";
+import { Layout, Modal, Snackbar } from "./components";
 import {
   CertificateGenerator,
   Dashboard,
   Tutorial,
   ZipExporter,
-  CSVImporter
+  CSVImporter,
 } from "./containers";
 import { ParticipantsPage } from "./pages/ParticipantsPage";
 import { ProjectsPage } from "./pages/ProjectsPage";
@@ -54,14 +50,9 @@ function App() {
     templates[0],
   );
   const [generatedCount, setGeneratedCount] = useState(0);
-
-  // Modals
   const [showImporter, setShowImporter] = useState(false);
   const [showZipExporter, setShowZipExporter] = useState(false);
 
-  // ... (keeping snackbar state)
-
-  // Snackbar state
   const [snackbar, setSnackbar] = useState<{
     isOpen: boolean;
     message: string;
@@ -83,7 +74,6 @@ function App() {
     setSnackbar({ isOpen: false, message: "", type: "info" });
   };
 
-  // Modal for important confirmations (keep for warnings that need confirmation)
   const [alertModal, setAlertModal] = useState<{
     isOpen: boolean;
     title: string;
@@ -110,14 +100,14 @@ function App() {
     setAlertModal({ isOpen: false, title: "", message: "", type: "info" });
   };
 
-  // Navigation State
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [unsavedChangesTab, setUnsavedChangesTab] = useState<string | null>(
+    null,
+  );
 
-  // Load custom templates and data
   useEffect(() => {
     const initData = async () => {
       try {
-        // Load tutorial status (localStorage)
         const tutorialCompleted = localStorage.getItem(
           "auto-cert-tutorial-completed",
         );
@@ -125,12 +115,10 @@ function App() {
           setShowTutorial(true);
         }
 
-        // Load participants
         const backendParticipants = await api.participants.getAll();
         setParticipants(backendParticipants);
         setIsInitialized(true);
 
-        // Load generated count
         const savedGenerated = await api.settings.get(
           "auto-cert-generated-count",
         );
@@ -138,7 +126,6 @@ function App() {
           setGeneratedCount(parseInt(savedGenerated));
         }
 
-        // Load selected template
         const savedTemplateStr = await api.settings.get(
           "auto-cert-selected-template",
         );
@@ -150,7 +137,6 @@ function App() {
           }
         }
 
-        // Load custom templates from API
         const customTemplatesStr = await api.settings.get(
           "auto-cert-custom-templates",
         );
@@ -177,12 +163,12 @@ function App() {
     initData();
   }, []);
 
-  // Sync participants to API whenever they change
   useEffect(() => {
     if (!isInitialized) return;
-    // We use a timeout to debounce updates to avoid flooding API on rapid changes
     const timeoutId = setTimeout(() => {
-      api.participants.setAll(participants).catch(e => console.error("Auto-save failed", e));
+      api.participants
+        .setAll(participants)
+        .catch((e) => console.error("Auto-save failed", e));
     }, 1000);
     return () => clearTimeout(timeoutId);
   }, [participants, isInitialized]);
@@ -192,7 +178,6 @@ function App() {
 
     switch (action) {
       case "import-csv":
-        // Import is still a specific action, can remain a modal or go to participants page
         setShowImporter(true);
         break;
       case "templates":
@@ -284,7 +269,6 @@ function App() {
   };
 
   const handleTemplateUpload = async (newTemplate: TemplateInfo) => {
-    // Save to API
     const stored = await api.settings.get("auto-cert-custom-templates");
     let custom: TemplateInfo[] = [];
     if (stored) {
@@ -296,35 +280,35 @@ function App() {
     }
     custom.push(newTemplate);
     try {
-      await api.settings.set("auto-cert-custom-templates", JSON.stringify(custom));
+      await api.settings.set(
+        "auto-cert-custom-templates",
+        JSON.stringify(custom),
+      );
     } catch (e) {
       console.error("Failed to update API storage", e);
     }
 
-    // Update state
-    setTemplates((prev) => [newTemplate, ...prev]); // Add to top
-
-    // Auto-select
+    setTemplates((prev) => [newTemplate, ...prev]);
     handleTemplateSelect(newTemplate);
   };
 
   const handleTemplateDelete = async (templateId: string) => {
-    // Remove from API
     const stored = await api.settings.get("auto-cert-custom-templates");
     if (stored) {
       try {
         const custom: TemplateInfo[] = JSON.parse(stored);
         const updated = custom.filter((t) => t.id !== templateId);
-        await api.settings.set("auto-cert-custom-templates", JSON.stringify(updated));
+        await api.settings.set(
+          "auto-cert-custom-templates",
+          JSON.stringify(updated),
+        );
       } catch (e) {
         console.error("Failed to update API metadata", e);
       }
     }
 
-    // Update state
     setTemplates((prev) => prev.filter((t) => t.id !== templateId));
 
-    // If selected, deselect
     if (selectedTemplate?.id === templateId) {
       setSelectedTemplate(null);
       await api.settings.set("auto-cert-selected-template", "");
@@ -333,11 +317,11 @@ function App() {
 
   const handleTemplateSelect = async (template: TemplateInfo) => {
     setSelectedTemplate(template);
-    // Store as JSON string in settings to keep consistency with previous logic,
-    // though backend settings are key-value strings. 
-    // We are trusting the backend settings table to hold this string.
     try {
-      await api.settings.set("auto-cert-selected-template", JSON.stringify(template));
+      await api.settings.set(
+        "auto-cert-selected-template",
+        JSON.stringify(template),
+      );
     } catch (e) {
       console.error("Failed to save selected template setting", e);
     }
@@ -346,7 +330,6 @@ function App() {
       setActiveTab("generator");
       showSnackbar(`Wybrano szablon. Przechodzę do generatora! ✨`, "success");
     } else {
-      // setActiveTab("participants"); // Disabled as per user request to stay on templates
       showSnackbar(
         `Wybrano szablon: ${template.name}. Pamiętaj o dodaniu uczestników!`,
         "info",
@@ -366,7 +349,10 @@ function App() {
     }
     if (data.selectedTemplate) {
       setSelectedTemplate(data.selectedTemplate);
-      await api.settings.set("auto-cert-selected-template", JSON.stringify(data.selectedTemplate));
+      await api.settings.set(
+        "auto-cert-selected-template",
+        JSON.stringify(data.selectedTemplate),
+      );
     }
     localStorage.setItem("auto-cert-tutorial-completed", "true");
     setShowTutorial(false);
@@ -399,7 +385,9 @@ function App() {
   useEffect(() => {
     const initProjects = async () => {
       try {
-        const savedProjects = await api.settings.get("auto-cert-recent-projects");
+        const savedProjects = await api.settings.get(
+          "auto-cert-recent-projects",
+        );
         if (savedProjects) {
           setRecentProjects(JSON.parse(savedProjects));
         }
@@ -437,7 +425,9 @@ function App() {
     setRecentProjects((prev) => {
       const filtered = prev.filter((p) => p.id !== projectId);
       const updated = [newProject, ...filtered].slice(0, 5); // Keep last 5
-      api.settings.set("auto-cert-recent-projects", JSON.stringify(updated)).catch(e => console.error("Could not save to API", e));
+      api.settings
+        .set("auto-cert-recent-projects", JSON.stringify(updated))
+        .catch((e) => console.error("Could not save to API", e));
       return updated;
     });
 
@@ -457,7 +447,9 @@ function App() {
       () => {
         setRecentProjects((prev) => {
           const updated = prev.filter((p) => p.id !== projectId);
-          api.settings.set("auto-cert-recent-projects", JSON.stringify(updated)).catch(e => console.error("Could not save to API", e));
+          api.settings
+            .set("auto-cert-recent-projects", JSON.stringify(updated))
+            .catch((e) => console.error("Could not save to API", e));
           return updated;
         });
         showSnackbar("Projekt został usunięty.", "success");
@@ -495,15 +487,7 @@ function App() {
             hasUnsavedChanges &&
             tab !== "generator"
           ) {
-            showAlert(
-              "Niezapisane zmiany",
-              "Masz niezapisane zmiany. Czy na pewno chcesz opuścić generator?",
-              "warning",
-              () => {
-                setHasUnsavedChanges(false);
-                setActiveTab(tab);
-              },
-            );
+            setUnsavedChangesTab(tab);
             return;
           }
 
@@ -613,7 +597,6 @@ function App() {
         />
       )}
 
-      {/* Alert Modal */}
       <Modal
         isOpen={alertModal.isOpen}
         onClose={closeAlert}
@@ -623,7 +606,55 @@ function App() {
         onConfirm={alertModal.onConfirm}
       />
 
-      {/* Snackbar for success/info notifications */}
+      <Modal
+        isOpen={unsavedChangesTab !== null}
+        onClose={() => setUnsavedChangesTab(null)}
+        title="Niezapisane zmiany"
+        message="Masz niezapisane zmiany. Wybierz co chcesz z nimi zrobić przed opuszczeniem generatora."
+        type="warning"
+      >
+        <div className="-mx-6 -mb-6 px-6 py-5 border-t border-gray-100 bg-gray-50 flex flex-col gap-3 flex-shrink-0">
+          <div className="relative group w-full">
+            <button
+              disabled={participants.length === 0}
+              onClick={() => {
+                handleManualSave();
+                setHasUnsavedChanges(false);
+                if (unsavedChangesTab) setActiveTab(unsavedChangesTab);
+                setUnsavedChangesTab(null);
+              }}
+              className={`w-full px-4 py-2.5 text-white rounded-xl text-sm font-bold transition-all shadow-md ${participants.length === 0
+                ? "bg-indigo-300 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98]"
+                }`}
+            >
+              Zapisz i wyjdź
+            </button>
+            {participants.length === 0 && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                Brak uczestników do zapisania
+                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+              </div>
+            )}
+          </div>
+          <button
+            onClick={() => {
+              setHasUnsavedChanges(false);
+              if (unsavedChangesTab) setActiveTab(unsavedChangesTab);
+              setUnsavedChangesTab(null);
+            }}
+            className="w-full px-4 py-2.5 text-red-700 bg-red-50 hover:bg-red-100 rounded-xl text-sm font-semibold transition-all active:scale-[0.98]"
+          >
+            Wyjdź bez zapisywania
+          </button>
+          <button
+            onClick={() => setUnsavedChangesTab(null)}
+            className="w-full px-4 py-2.5 text-gray-500 bg-white rounded-xl text-sm font-medium transition-all shadow-sm ring-1 ring-inset ring-gray-200 hover:bg-gray-50 active:scale-[0.98]"
+          >
+            Anuluj
+          </button>
+        </div>
+      </Modal>
       <Snackbar
         isOpen={snackbar.isOpen}
         message={snackbar.message}

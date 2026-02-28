@@ -56,11 +56,6 @@ describe("Snackbar Component", () => {
       expect(snackbar).toHaveClass("border-red-200");
     });
   });
-
-  // ... auto close ...
-
-  // ... manual close ...
-
   describe("Positioning", () => {
     it("is positioned at bottom-left of screen", () => {
       renderWithProviders(<Snackbar {...defaultProps} />);

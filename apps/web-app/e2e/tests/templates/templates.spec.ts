@@ -10,8 +10,12 @@ test.describe("Templates Feature", () => {
     await context.addInitScript(() => {
       window.localStorage.setItem("auto-cert-tutorial-completed", "true");
     });
-    await request.put("/api/settings/auto-cert-recent-projects", { data: { value: "" } });
-    await request.put("/api/settings/auto-cert-custom-templates", { data: { value: "[]" } });
+    await request.put("/api/settings/auto-cert-recent-projects", {
+      data: { value: "" },
+    });
+    await request.put("/api/settings/auto-cert-custom-templates", {
+      data: { value: "[]" },
+    });
 
     await page.goto("/");
     await page.waitForLoadState("networkidle");

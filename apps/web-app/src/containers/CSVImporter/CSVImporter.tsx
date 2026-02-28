@@ -17,10 +17,7 @@ interface CSVImporterProps {
   onClose: () => void;
 }
 
-export const CSVImporter = ({
-  onImport,
-  onClose,
-}: CSVImporterProps) => {
+export const CSVImporter = ({ onImport, onClose }: CSVImporterProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState<string[][]>([]);
   const [fileName, setFileName] = useState("");
@@ -55,7 +52,6 @@ export const CSVImporter = ({
       file.name.endsWith(".xlsm");
 
     if (isExcel) {
-      // Handle Excel files
       const reader = new FileReader();
       reader.onload = (e) => {
         const data = e.target?.result;
@@ -67,7 +63,6 @@ export const CSVImporter = ({
       };
       reader.readAsBinaryString(file);
     } else {
-      // Handle CSV files
       const reader = new FileReader();
       reader.onload = (e) => {
         const text = e.target?.result as string;
@@ -137,7 +132,6 @@ export const CSVImporter = ({
       return;
     }
 
-    // Bezpośrednio wywołaj import bez modalu sukcesu
     onImport(participants, fileName);
     onClose();
   };

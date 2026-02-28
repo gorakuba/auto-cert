@@ -16,16 +16,39 @@ export const ProjectsPage = ({
   onNewProject,
 }: ProjectsPageProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState("newest");
+
+  const filters = [
+    { id: "newest", label: "Od najnowszych" },
+    { id: "oldest", label: "Od najstarszych" },
+    { id: "az", label: "Od A do Z" },
+    { id: "za", label: "Od Z do A" },
+  ];
 
   const filteredProjects = useMemo(() => {
-    return projects.filter((project) =>
+    let result = projects.filter((project) =>
       project.templateName.toLowerCase().includes(searchQuery.toLowerCase()),
     );
-  }, [projects, searchQuery]);
+
+    if (activeFilter === "newest") {
+      result = result.sort((a, b) => b.lastEdited - a.lastEdited);
+    } else if (activeFilter === "oldest") {
+      result = result.sort((a, b) => a.lastEdited - b.lastEdited);
+    } else if (activeFilter === "az") {
+      result = result.sort((a, b) =>
+        a.templateName.localeCompare(b.templateName),
+      );
+    } else if (activeFilter === "za") {
+      result = result.sort((a, b) =>
+        b.templateName.localeCompare(a.templateName),
+      );
+    }
+
+    return result;
+  }, [projects, searchQuery, activeFilter]);
 
   return (
-    <div className="w-full h-full flex flex-col animate-in fade-in duration-300">
-      {/* Header */}
+    <div className="w-full min-h-full flex flex-col animate-in fade-in duration-300">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Twoje Projekty</h1>
@@ -53,14 +76,15 @@ export const ProjectsPage = ({
         </button>
       </header>
 
-      {/* Search & Filter Bar */}
       <SearchToolbar
         value={searchQuery}
         onChange={setSearchQuery}
         placeholder="Szukaj projektu..."
+        filters={filters}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
       />
 
-      {/* Projects Grid */}
       {filteredProjects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProjects.map((project) => (
@@ -68,7 +92,6 @@ export const ProjectsPage = ({
               key={project.id}
               className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group overflow-hidden flex flex-col"
             >
-              {/* Thumbnail */}
               <div className="h-40 bg-gray-100 relative overflow-hidden">
                 {project.templateThumbnail ? (
                   <img
@@ -95,7 +118,6 @@ export const ProjectsPage = ({
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
               </div>
 
-              {/* Content */}
               <div className="p-5 flex-1 flex flex-col">
                 <div className="flex justify-between items-start mb-2">
                   <h3
@@ -197,8 +219,8 @@ export const ProjectsPage = ({
               : "Brak zapisanych projektów"}
           </h2>
           <p className="text-gray-500 max-w-sm mb-8">
-            {searchQuery
-              ? "Spróbuj zmienić zapytanie."
+            {searchQuery || activeFilter !== "newest"
+              ? "Spróbuj zmienić zapytanie wyszukiwania lub usunąć filtry."
               : "Rozpocznij pracę nad nowym certyfikatem, a Twoje postępy zostaną tutaj zapisane."}
           </p>
         </div>

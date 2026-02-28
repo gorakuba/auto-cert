@@ -12,8 +12,12 @@ test.describe("Participants Feature", () => {
     });
     // 2. Clear data
     await request.delete("/api/participants");
-    await request.put("/api/settings/auto-cert-recent-projects", { data: { value: "" } });
-    await request.put("/api/settings/auto-cert-custom-templates", { data: { value: "[]" } });
+    await request.put("/api/settings/auto-cert-recent-projects", {
+      data: { value: "" },
+    });
+    await request.put("/api/settings/auto-cert-custom-templates", {
+      data: { value: "[]" },
+    });
 
     await page.goto("/");
     await page.waitForLoadState("networkidle");
@@ -30,10 +34,13 @@ test.describe("Participants Feature", () => {
     await snapshot(page, `${SCREENSHOT_DIR}/participants-page.png`);
   });
 
-  test("shows participants in table when data exists", async ({ page, request }) => {
+  test("shows participants in table when data exists", async ({
+    page,
+    request,
+  }) => {
     // Seed data via API
     await request.post("/api/participants/bulk", {
-      data: [{ id: "1", name: "Jan Testowy", email: "jan@test.pl" }]
+      data: [{ id: "1", name: "Jan Testowy", email: "jan@test.pl" }],
     });
 
     await page.reload();
@@ -56,7 +63,10 @@ test.describe("Participants Feature", () => {
       page.getByRole("heading", { name: "Dodaj uczestników" }),
     ).toBeVisible();
 
-    await page.locator("button").filter({ hasText: /^Z pliku/ }).click();
+    await page
+      .locator("button")
+      .filter({ hasText: /^Z pliku/ })
+      .click();
 
     await expect(
       page.getByRole("heading", { name: "Importuj Uczestników" }),

@@ -24,6 +24,8 @@ export const ParticipantsPage = ({
   onShowSnackbar,
 }: ParticipantsPageProps) => {
   const [search, setSearch] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
@@ -36,12 +38,26 @@ export const ParticipantsPage = ({
   });
   const [deleteAllModal, setDeleteAllModal] = useState(false);
 
-  const filteredParticipants = participants.filter(
-    (p) =>
+  const filters = [
+    { id: "all", label: "Wszyscy" },
+    { id: "with-email", label: "Z e-mailem" },
+    { id: "with-score", label: "Z wynikiem" },
+  ];
+
+  const filteredParticipants = participants.filter((p) => {
+    const matchesSearch =
       p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.email?.toLowerCase().includes(search.toLowerCase()) ||
-      p.company?.toLowerCase().includes(search.toLowerCase()),
-  );
+      (p.email?.toLowerCase() || "").includes(search.toLowerCase()) ||
+      (p.company?.toLowerCase() || "").includes(search.toLowerCase());
+
+    if (!matchesSearch) return false;
+
+    if (activeFilter === "with-email") return p.email && p.email.trim() !== "";
+    if (activeFilter === "with-score")
+      return p.score !== undefined && p.score !== null;
+
+    return true;
+  });
 
   const handleEdit = (participant: Participant) => {
     setEditingId(participant.id);
@@ -87,10 +103,6 @@ export const ParticipantsPage = ({
     Partial<Participant>
   >({});
 
-  // ... existing filters ...
-
-  // ... existing handleEdit, handleSave, handleDelete ...
-
   const handleAddClick = () => {
     setAddMethodModalOpen(true);
   };
@@ -133,8 +145,6 @@ export const ParticipantsPage = ({
     onShowSnackbar("Dodano nowego uczestnika", "success");
   };
 
-  // ... existing delete logic ...
-
   const handleDeleteAll = () => {
     setDeleteAllModal(true);
   };
@@ -148,8 +158,7 @@ export const ParticipantsPage = ({
   };
 
   return (
-    <div className="w-full animate-in fade-in duration-300">
-      {/* Page Header */}
+    <div className="flex flex-col min-h-full w-full animate-in fade-in duration-300">
       <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">
@@ -175,11 +184,13 @@ export const ParticipantsPage = ({
         </button>
       </div>
 
-      {/* Search Toolbar */}
       <SearchToolbar
         value={search}
         onChange={setSearch}
         placeholder="Szukaj uczestnika..."
+        filters={filters}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
       >
         {participants.length > 0 && (
           <button
@@ -200,10 +211,8 @@ export const ParticipantsPage = ({
       </SearchToolbar>
 
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-        {/* Content */}
         {filteredParticipants.length > 0 && (
           <>
-            {/* ... Table (keeping existing table structure) ... */}
             <div className="overflow-x-auto w-full">
               <table className="w-full min-w-full table-auto">
                 <thead className="bg-gray-50/50">
@@ -245,7 +254,6 @@ export const ParticipantsPage = ({
               </table>
             </div>
 
-            {/* Footer */}
             <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50/30">
               <p className="text-sm text-gray-500">
                 Wyświetlono {filteredParticipants.length} z{" "}
@@ -257,18 +265,16 @@ export const ParticipantsPage = ({
       </div>
 
       {filteredParticipants.length === 0 && (
-        <div className="mt-8">
+        <div className="flex-1 flex flex-col mt-4">
           <ParticipantEmptyState search={search} />
         </div>
       )}
 
-      {/* Add Method Modal */}
       <Modal
         isOpen={addMethodModalOpen}
         onClose={() => setAddMethodModalOpen(false)}
         title="Dodaj uczestników"
         type="info"
-      // Custom content instead of standard message
       >
         <div className="grid grid-cols-2 gap-4">
           <button
@@ -319,7 +325,6 @@ export const ParticipantsPage = ({
         </div>
       </Modal>
 
-      {/* Manual Add Form Modal */}
       <Modal
         isOpen={manualAddOpen}
         onClose={() => setManualAddOpen(false)}
@@ -426,7 +431,6 @@ export const ParticipantsPage = ({
         </div>
       </Modal>
 
-      {/* Existing Delete Modals */}
       <Modal
         isOpen={deleteModal.isOpen}
         onClose={cancelDelete}

@@ -53,7 +53,6 @@ export function Tutorial({ onComplete, templates }: TutorialProps) {
       const text = event.target?.result as string;
       if (!text) return;
 
-      // Simple CSV parsing
       const lines = text.split("\n").filter((line) => line.trim());
       if (lines.length < 2) {
         showAlert(
@@ -87,7 +86,6 @@ export function Tutorial({ onComplete, templates }: TutorialProps) {
             name: values[nameIndex],
           };
 
-          // Optional fields
           const emailIndex = headers.findIndex((h) =>
             ["email", "e-mail", "mail"].includes(h),
           );
@@ -137,7 +135,6 @@ export function Tutorial({ onComplete, templates }: TutorialProps) {
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Complete tutorial
       onComplete({ participants, selectedTemplate, fileName });
     }
   };
@@ -149,7 +146,6 @@ export function Tutorial({ onComplete, templates }: TutorialProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
       <div className="max-w-4xl w-full">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-3">
             🎓 Witaj w AutoCert!
