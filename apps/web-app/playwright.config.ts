@@ -24,7 +24,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "yarn dev",
+    command: "yarn start",
     url: "http://localhost:5173",
     reuseExistingServer: !process.env.CI,
   },
